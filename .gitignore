@@ -1,0 +1,90 @@
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+
+# ── Virtual Environment ───────────────────────────────────
+diet_venv/
+venv/
+env/
+.env/
+.venv/
+
+# ── Django ────────────────────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# ── ML Models (too large for GitHub) ─────────────────────
+recommender/ml/*.keras
+recommender/ml/*.pkl
+recommender/ml/random_forest.pkl
+recommender/ml/lightgbm.pkl
+recommender/ml/ann.keras
+recommender/ml/lstm.keras
+recommender/ml/feature_names.pkl
+models/
+encoders/
+
+# ── Dataset files ─────────────────────────────────────────
+*.csv
+*.xlsx
+mynaijadiet_processed.csv
+mynaijadiet_dataset_v2.csv
+meal_id_map.csv
+
+# ── Environment variables ─────────────────────────────────
+.env
+.env.local
+.env.production
+*.env
+
+# ── VS Code ───────────────────────────────────────────────
+.vscode/
+*.code-workspace
+
+# ── Node (Tailwind) ───────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ── OS files ──────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── Static files (generated) ─────────────────────────────
+staticfiles/
+static/css/output.css
+
+# ── Jupyter ───────────────────────────────────────────────
+.ipynb_checkpoints
+*.ipynb
+
+# ── Misc ──────────────────────────────────────────────────
+*.bak
+*.swp
+*.tmp
+.cache/

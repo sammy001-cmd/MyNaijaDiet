@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | MyNaijaDiet{% endblock %}
+
+{% block extra_head %}
+<style>
+    .donut-segment { transition: stroke-dasharray 0.3s ease; }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Sidebar -->
+<aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant bg-surface-container-low fixed left-0 top-0 w-64 z-40">
+  <div class="mb-stack-lg px-4">
+    <h1 class="font-headline-md text-headline-md text-primary font-bold">MyNaijaDiet</h1>
+    <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Premium Nutrition</p>
+  </div>
+  <nav class="flex-1 space-y-2">
+    <a class="flex items-center gap-stack-md bg-primary-container text-on-primary-container rounded-lg px-4 py-3" href="{% url 'dashboard' %}">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-label-md">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'recommendations' %}">
+      <span class="material-symbols-outlined">recommend</span><span class="font-label-md">Recommendations</span>
+    </a>
+    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'meal_plan' %}">
+      <span class="material-symbols-outlined">restaurant_menu</span><span class="font-label-md">Meal Plan</span>
+    </a>
+    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'profile' %}">
+      <span class="material-symbols-outlined">person</span><span class="font-label-md">Profile</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- Mobile Header -->
+<header class="lg:hidden flex justify-between items-center w-full px-margin-mobile py-4 sticky top-0 z-50 bg-surface shadow-sm">
+  <h1 class="font-headline-md text-headline-md font-bold text-primary">MyNaijaDiet</h1>
+  <div class="flex items-center gap-4">
+    <a href="{% url 'profile' %}" class="w-10 h-10 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+      <span class="text-on-primary font-bold text-sm">{{ user_initials }}</span>
+    </a>
+  </div>
+</header>
+
+<main class="lg:ml-64 px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto pb-32">
+
+  <!-- Greeting -->
+  <section class="mb-stack-lg flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <h2 class="font-headline-lg text-headline-lg text-primary">{{ greeting }}, {{ user_name }}!</h2>
+      <p class="text-body-lg text-on-surface-variant mt-2">
+        {% if profile.health_goal == 'weight_loss' %}Stay consistent — every healthy meal counts toward your goal.
+        {% elif profile.health_goal == 'muscle_gain' %}Fuel up right — your muscles need quality nutrition today.
+        {% else %}Keep it balanced — you're doing great!{% endif %}
+      </p>
+    </div>
+    <div class="flex items-center gap-stack-md bg-white p-4 rounded-xl shadow-sm border border-outline-variant/30">
+      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+      </div>
+      <div>
+        <p class="text-caption text-on-surface-variant font-bold uppercase tracking-wider">Daily Target</p>
+        <p class="font-headline-md text-on-surface">{{ calorie_target }} kcal</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stat Cards -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-lg">
+
+    <!-- Calorie Card -->
+    <div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col justify-between min-h-[220px]">
+      <div class="flex justify-between items-start">
+        <span class="material-symbols-outlined text-primary text-3xl">bolt</span>
+        <span class="text-caption text-on-surface-variant px-3 py-1 bg-surface-container rounded-full">Daily Target</span>
+      </div>
+      <div>
+        <h3 class="text-headline-xl font-bold text-on-surface">{{ calorie_target }}</h3>
+        <p class="text-body-md text-on-surface-variant">kcal recommended</p>
+      </div>
+      <div class="mt-4 space-y-1">
+        <div class="flex justify-between text-caption">
+          <span class="text-on-surface-variant">Goal</span>
+          <span class="font-bold text-primary capitalize">{{ profile.health_goal|cut:"_" }}</span>
+        </div>
+        <div class="flex justify-between text-caption">
+          <span class="text-on-surface-variant">BMI</span>
+          <span class="font-bold text-primary">{{ profile.bmi }} — {{ bmi_status }}</span>
+        </div>
+        <div class="flex justify-between text-caption">
+          <span class="text-on-surface-variant">Today's AI Plan</span>
+          <span class="font-bold text-primary">{{ plan_total_kcal }} kcal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Macros Donut -->
+    <div class="md:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-outline-variant/20 flex flex-col md:flex-row items-center gap-8">
+      <div class="relative w-40 h-40 shrink-0">
+        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+          <circle class="stroke-surface-container" cx="18" cy="18" fill="none" r="16" stroke-width="4"></circle>
+          <circle class="stroke-primary donut-segment" cx="18" cy="18" fill="none" r="16"
+            stroke-dasharray="{{ protein_pct }} 100" stroke-linecap="round" stroke-width="4"></circle>
+          <circle class="stroke-secondary-container donut-segment" cx="18" cy="18" fill="none" r="16"
+            stroke-dasharray="{{ carb_pct }} 100" stroke-dashoffset="-{{ protein_pct }}"
+            stroke-linecap="round" stroke-width="4"></circle>
+          <circle class="stroke-secondary-fixed-dim donut-segment" cx="18" cy="18" fill="none" r="16"
+            stroke-dasharray="{{ fat_pct }} 100" stroke-dashoffset="-{{ protein_carb_pct }}"
+            stroke-linecap="round" stroke-width="4"></circle>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-headline-md font-bold text-on-surface">{{ macro_protein_target }}g</span>
+          <span class="text-caption text-on-surface-variant">Protein</span>
+        </div>
+      </div>
+      <div class="flex-1 w-full space-y-4">
+        <h4 class="font-headline-md text-on-surface">Daily Macro Targets</h4>
+        <p class="text-caption text-on-surface-variant">Based on your {{ calorie_target }} kcal goal</p>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-primary"></div>
+              <span class="text-body-md">Protein</span>
+            </div>
+            <span class="font-bold">{{ macro_protein_target }}g / day</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-secondary-container"></div>
+              <span class="text-body-md">Carbs</span>
+            </div>
+            <span class="font-bold">{{ macro_carb_target }}g / day</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-secondary-fixed-dim"></div>
+              <span class="text-body-md">Fats</span>
+            </div>
+            <span class="font-bold">{{ macro_fat_target }}g / day</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI Meal Plan Section -->
+  <section class="mb-stack-lg">
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h3 class="font-headline-md text-on-surface">Today's AI-Generated Meal Plan</h3>
+        <p class="text-caption text-on-surface-variant mt-1">
+          Personalised for your <strong class="text-primary capitalize">{{ profile.health_goal|cut:"_" }}</strong> goal
+          · {{ plan_total_kcal }} kcal total
+          · {{ plan_total_protein }}g protein
+        </p>
+      </div>
+      <a class="text-primary font-bold flex items-center gap-1 hover:underline text-caption" href="{% url 'meal_plan' %}">
+        Full Plan <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+
+      <!-- BREAKFAST -->
+      {% if breakfast_meal %}
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-outline-variant/10 flex flex-col">
+        <div class="relative h-40 bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-5xl text-outline">egg_alt</span>
+          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full text-[10px] font-bold text-primary">BREAKFAST</div>
+          <div class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded-full text-[10px] font-bold">{{ breakfast_meal.calories }} kcal</div>
+        </div>
+        <div class="p-4 flex flex-col flex-grow">
+          <h4 class="font-label-md text-on-surface font-bold mb-1 text-sm">{{ breakfast_meal.name }}</h4>
+          <p class="text-[11px] text-on-surface-variant mb-1">{{ breakfast_meal.protein }}g protein · {{ breakfast_meal.carbs }}g carbs · {{ breakfast_meal.fat }}g fat</p>
+          <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded capitalize w-fit mb-3">{{ breakfast_meal.diet_type }}</span>
+          <div class="mt-auto flex gap-2">
+            <a href="{% url 'meal_detail' breakfast_meal.id %}" class="flex-1 text-center py-2 border border-primary text-primary rounded-lg text-[11px] font-bold hover:bg-primary hover:text-white transition-all">
+              Details
+            </a>
+            <a href="{% url 'recommendations' %}?meal_time=breakfast&swap=true" class="flex-1 text-center py-2 bg-surface-container text-on-surface-variant rounded-lg text-[11px] font-bold hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">swap_horiz</span>Swap
+            </a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <a href="{% url 'recommendations' %}?meal_time=breakfast" class="bg-white rounded-2xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center min-h-[260px] gap-2 hover:border-primary hover:bg-surface-container-low transition-all">
+        <span class="material-symbols-outlined text-outline text-4xl">egg_alt</span>
+        <span class="font-label-md text-on-surface-variant text-sm">Add Breakfast</span>
+      </a>
+      {% endif %}
+
+      <!-- LUNCH -->
+      {% if lunch_meal %}
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-outline-variant/10 flex flex-col">
+        <div class="relative h-40 bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-5xl text-outline">set_meal</span>
+          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full text-[10px] font-bold text-primary">LUNCH</div>
+          <div class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded-full text-[10px] font-bold">{{ lunch_meal.calories }} kcal</div>
+        </div>
+        <div class="p-4 flex flex-col flex-grow">
+          <h4 class="font-label-md text-on-surface font-bold mb-1 text-sm">{{ lunch_meal.name }}</h4>
+          <p class="text-[11px] text-on-surface-variant mb-1">{{ lunch_meal.protein }}g protein · {{ lunch_meal.carbs }}g carbs · {{ lunch_meal.fat }}g fat</p>
+          <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded capitalize w-fit mb-3">{{ lunch_meal.diet_type }}</span>
+          <div class="mt-auto flex gap-2">
+            <a href="{% url 'meal_detail' lunch_meal.id %}" class="flex-1 text-center py-2 border border-primary text-primary rounded-lg text-[11px] font-bold hover:bg-primary hover:text-white transition-all">
+              Details
+            </a>
+            <a href="{% url 'recommendations' %}?meal_time=lunch&swap=true" class="flex-1 text-center py-2 bg-surface-container text-on-surface-variant rounded-lg text-[11px] font-bold hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">swap_horiz</span>Swap
+            </a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <a href="{% url 'recommendations' %}?meal_time=lunch" class="bg-white rounded-2xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center min-h-[260px] gap-2 hover:border-primary hover:bg-surface-container-low transition-all">
+        <span class="material-symbols-outlined text-outline text-4xl">set_meal</span>
+        <span class="font-label-md text-on-surface-variant text-sm">Add Lunch</span>
+      </a>
+      {% endif %}
+
+      <!-- DINNER -->
+      {% if dinner_meal %}
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-outline-variant/10 flex flex-col">
+        <div class="relative h-40 bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-5xl text-outline">soup_kitchen</span>
+          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full text-[10px] font-bold text-primary">DINNER</div>
+          <div class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded-full text-[10px] font-bold">{{ dinner_meal.calories }} kcal</div>
+        </div>
+        <div class="p-4 flex flex-col flex-grow">
+          <h4 class="font-label-md text-on-surface font-bold mb-1 text-sm">{{ dinner_meal.name }}</h4>
+          <p class="text-[11px] text-on-surface-variant mb-1">{{ dinner_meal.protein }}g protein · {{ dinner_meal.carbs }}g carbs · {{ dinner_meal.fat }}g fat</p>
+          <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded capitalize w-fit mb-3">{{ dinner_meal.diet_type }}</span>
+          <div class="mt-auto flex gap-2">
+            <a href="{% url 'meal_detail' dinner_meal.id %}" class="flex-1 text-center py-2 border border-primary text-primary rounded-lg text-[11px] font-bold hover:bg-primary hover:text-white transition-all">
+              Details
+            </a>
+            <a href="{% url 'recommendations' %}?meal_time=dinner&swap=true" class="flex-1 text-center py-2 bg-surface-container text-on-surface-variant rounded-lg text-[11px] font-bold hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">swap_horiz</span>Swap
+            </a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <a href="{% url 'recommendations' %}?meal_time=dinner" class="bg-white rounded-2xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center min-h-[260px] gap-2 hover:border-primary hover:bg-surface-container-low transition-all">
+        <span class="material-symbols-outlined text-outline text-4xl">soup_kitchen</span>
+        <span class="font-label-md text-on-surface-variant text-sm">Add Dinner</span>
+      </a>
+      {% endif %}
+
+      <!-- SNACK -->
+      {% if snack_meal %}
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all border border-outline-variant/10 flex flex-col">
+        <div class="relative h-40 bg-surface-container flex items-center justify-center">
+          <span class="material-symbols-outlined text-5xl text-outline">bakery_dining</span>
+          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full text-[10px] font-bold text-primary">SNACK</div>
+          <div class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded-full text-[10px] font-bold">{{ snack_meal.calories }} kcal</div>
+        </div>
+        <div class="p-4 flex flex-col flex-grow">
+          <h4 class="font-label-md text-on-surface font-bold mb-1 text-sm">{{ snack_meal.name }}</h4>
+          <p class="text-[11px] text-on-surface-variant mb-1">{{ snack_meal.protein }}g protein · {{ snack_meal.carbs }}g carbs · {{ snack_meal.fat }}g fat</p>
+          <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded capitalize w-fit mb-3">{{ snack_meal.diet_type }}</span>
+          <div class="mt-auto flex gap-2">
+            <a href="{% url 'meal_detail' snack_meal.id %}" class="flex-1 text-center py-2 border border-primary text-primary rounded-lg text-[11px] font-bold hover:bg-primary hover:text-white transition-all">
+              Details
+            </a>
+            <a href="{% url 'recommendations' %}?meal_time=snack&swap=true" class="flex-1 text-center py-2 bg-surface-container text-on-surface-variant rounded-lg text-[11px] font-bold hover:bg-primary/10 hover:text-primary transition-all flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">swap_horiz</span>Swap
+            </a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <a href="{% url 'recommendations' %}?meal_time=snack" class="bg-white rounded-2xl border-2 border-dashed border-outline-variant flex flex-col items-center justify-center min-h-[260px] gap-2 hover:border-primary hover:bg-surface-container-low transition-all">
+        <span class="material-symbols-outlined text-outline text-4xl">bakery_dining</span>
+        <span class="font-label-md text-on-surface-variant text-sm">Add Snack</span>
+      </a>
+      {% endif %}
+
+    </div>
+  </section>
+
+  <!-- Quick Stats -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20 text-center">
+      <span class="material-symbols-outlined text-primary text-3xl">monitor_weight</span>
+      <p class="text-caption text-on-surface-variant mt-2">Weight</p>
+      <p class="font-headline-md text-on-surface font-bold">{{ profile.weight_kg }} kg</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20 text-center">
+      <span class="material-symbols-outlined text-primary text-3xl">height</span>
+      <p class="text-caption text-on-surface-variant mt-2">Height</p>
+      <p class="font-headline-md text-on-surface font-bold">{{ profile.height_cm }} cm</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20 text-center">
+      <span class="material-symbols-outlined text-primary text-3xl">fitness_center</span>
+      <p class="text-caption text-on-surface-variant mt-2">Activity</p>
+      <p class="font-headline-md text-on-surface font-bold capitalize">{{ profile.activity_level }}</p>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-outline-variant/20 text-center">
+      <span class="material-symbols-outlined text-primary text-3xl">straighten</span>
+      <p class="text-caption text-on-surface-variant mt-2">BMI</p>
+      <p class="font-headline-md text-on-surface font-bold">{{ profile.bmi }}</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Nav (Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 lg:hidden bg-surface shadow-lg rounded-t-xl border-t border-outline-variant/10">
+  <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-6 py-1" href="{% url 'dashboard' %}">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+    <span class="text-caption font-bold">Dashboard</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant" href="{% url 'recommendations' %}">
+    <span class="material-symbols-outlined">recommend</span>
+    <span class="text-caption">Recs</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant" href="{% url 'meal_plan' %}">
+    <span class="material-symbols-outlined">restaurant_menu</span>
+    <span class="text-caption">Plan</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant" href="{% url 'profile' %}">
+    <span class="material-symbols-outlined">person</span>
+    <span class="text-caption">Profile</span>
+  </a>
+</nav>
+
+<!-- Footer -->
+<footer class="w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest lg:ml-64 lg:w-[calc(100%-256px)]">
+  <div class="max-w-container-max mx-auto py-stack-lg flex flex-col md:flex-row justify-between items-center gap-stack-md">
+    <h4 class="font-headline-md text-headline-md text-primary font-bold">MyNaijaDiet</h4>
+    <p class="text-caption text-on-surface-variant">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
+  </div>
+</footer>
+{% endblock %}

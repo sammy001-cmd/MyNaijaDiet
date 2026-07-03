@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Login | MyNaijaDiet{% endblock %}
+
+{% block extra_head %}
+<style>
+    .bg-pattern {
+        background-color: #fbf9f8;
+        background-image: radial-gradient(#c0c9bb 0.5px, transparent 0.5px);
+        background-size: 24px 24px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="bg-pattern min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface shadow-sm flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto sticky top-0 z-50">
+  <div class="font-headline-md text-headline-md font-bold text-primary">MyNaijaDiet</div>
+  <nav class="hidden md:flex gap-stack-lg items-center">
+    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'landing' %}">Home</a>
+    <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+    <a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="{% url 'login' %}">Login</a>
+    <a class="font-body-md text-body-md px-6 py-2 bg-primary text-on-primary rounded-full hover:shadow-lg transition-all active:scale-95" href="{% url 'register' %}">Register</a>
+  </nav>
+  <button class="md:hidden text-primary">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+</header>
+
+<!-- Login Main Content -->
+<main class="flex-grow flex items-center justify-center px-margin-mobile py-stack-lg">
+  <div class="w-full max-w-md">
+    <div class="bg-surface-container-lowest rounded-xl p-8 md:p-10 border border-outline-variant/30 shadow-[0px_4px_20px_rgba(27,94,32,0.04)]">
+
+      <!-- Brand Identity -->
+      <div class="flex flex-col items-center mb-stack-lg text-center">
+        <div class="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mb-stack-md">
+          <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">eco</span>
+        </div>
+        <h1 class="font-headline-md text-headline-md text-on-surface mb-1">Welcome Back</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant">Log in to track your Nigerian meals &amp; nutrients</p>
+      </div>
+
+      <!-- Form -->
+      <form method="post" action="{% url 'login' %}" class="space-y-stack-md">
+        {% csrf_token %}
+
+        <div class="space-y-2">
+          <label class="font-label-md text-label-md text-on-surface-variant px-1" for="email">Email Address</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+            <input name="email" class="w-full pl-12 pr-4 py-3 bg-surface-container-low border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl transition-all font-body-md outline-none" id="email" placeholder="yourname@example.com" required type="email">
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between items-center px-1">
+            <label class="font-label-md text-label-md text-on-surface-variant" for="password">Password</label>
+            <a class="font-label-md text-label-md text-primary hover:underline transition-all" href="#">Forgot Password?</a>
+          </div>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">lock</span>
+            <input name="password" class="w-full pl-12 pr-12 py-3 bg-surface-container-low border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary rounded-xl transition-all font-body-md outline-none" id="password" placeholder="********" required type="password">
+            <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors">
+              <span class="material-symbols-outlined" id="toggle-icon">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 px-1 py-1">
+          <input name="remember" class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" id="remember" type="checkbox">
+          <label class="font-caption text-caption text-on-surface-variant" for="remember">Stay logged in for 30 days</label>
+        </div>
+
+        <button class="w-full bg-primary text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-sm hover:shadow-md hover:bg-primary-container transition-all transform active:scale-[0.98] mt-4" type="submit">
+          Login
+        </button>
+      </form>
+
+      <!-- Registration Link -->
+      <p class="text-center mt-stack-lg font-body-md text-body-md text-on-surface-variant">
+        New to MyNaijaDiet?
+        <a class="text-primary font-bold hover:underline transition-all" href="{% url 'register' %}">Register Now</a>
+      </p>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest py-stack-lg">
+  <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md">
+    <div class="font-caption text-caption text-on-surface-variant">&copy; 2026 MyNaijaDiet. Health is Wealth.</div>
+    <div class="flex gap-stack-lg">
+      <a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+      <a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+      <a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a>
+    </div>
+  </div>
+</footer>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+function togglePassword() {
+    const pass = document.getElementById('password');
+    const icon = document.getElementById('toggle-icon');
+    if (pass.type === 'password') {
+        pass.type = 'text';
+        icon.textContent = 'visibility_off';
+    } else {
+        pass.type = 'password';
+        icon.textContent = 'visibility';
+    }
+}
+{% endblock %}

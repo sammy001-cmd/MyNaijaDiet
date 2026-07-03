@@ -1,0 +1,336 @@
+{% extends "base.html" %} {% block title %}Recommendations | MyNaijaDiet{% endblock %} {% block extra_head %}
+<style>
+  .pill-active {
+    background-color: #1b5e20;
+    color: #90d689;
+  }
+</style>
+{% endblock %} {% block body %}
+<aside
+  class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant bg-surface-container-low fixed left-0 top-0 w-64 z-50"
+>
+  <div class="mb-stack-lg px-4">
+    <h1 class="font-headline-md text-headline-md text-primary font-bold">
+      MyNaijaDiet
+    </h1>
+    <p class="font-label-md text-label-md text-on-surface-variant opacity-70">
+      Premium Nutrition
+    </p>
+  </div>
+  <nav class="flex-grow space-y-2">
+    <a
+      class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors"
+      href="{% url 'dashboard' %}"
+    >
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="font-label-md">Dashboard</span>
+    </a>
+    <a
+      class="flex items-center gap-stack-md bg-primary-container text-on-primary-container rounded-lg px-4 py-3 transition-colors"
+      href="{% url 'recommendations' %}"
+    >
+      <span class="material-symbols-outlined">recommend</span>
+      <span class="font-label-md">Recommendations</span>
+    </a>
+    <a
+      class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors"
+      href="{% url 'meal_plan' %}"
+    >
+      <span class="material-symbols-outlined">restaurant_menu</span>
+      <span class="font-label-md">Meal Plan</span>
+    </a>
+    <a
+      class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors"
+      href="{% url 'profile' %}"
+    >
+      <span class="material-symbols-outlined">person</span>
+      <span class="font-label-md">Profile</span>
+    </a>
+  </nav>
+</aside>
+
+<main class="lg:ml-64 pb-24 lg:pb-12">
+  <header
+    class="sticky top-0 z-40 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto bg-surface shadow-sm"
+  >
+    <h2
+      class="font-headline-md text-headline-md font-bold text-primary md:hidden"
+    >
+      MyNaijaDiet
+    </h2>
+    <span
+      class="hidden md:block font-headline-md text-headline-md font-bold text-primary"
+      >Meal Recommendations</span
+    >
+    <div class="flex items-center gap-4">
+      <span
+        class="material-symbols-outlined p-2 text-on-surface-variant cursor-pointer"
+        >notifications</span
+      >
+      <div
+        class="w-10 h-10 rounded-full border-2 border-primary-fixed bg-surface-container flex items-center justify-center"
+      >
+        <span class="material-symbols-outlined text-primary">person</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filter Bar -->
+  <section
+    class="px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto"
+  >
+    <div class="flex flex-col gap-stack-md">
+      <!-- Search Box -->
+      <form
+        method="get"
+        action="{% url 'recommendations' %}"
+        class="flex flex-wrap items-center justify-between gap-4"
+      >
+        <div class="relative flex-grow max-w-md">
+          <span
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+            >search</span
+          >
+          <input
+            name="search"
+            value="{{ active_search }}"
+            class="w-full pl-10 pr-4 py-3 rounded-xl border-[1.5px] border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 transition-colors font-body-md"
+            placeholder="Search Jollof, Egusi, Amala..."
+            type="text"
+          />
+          <!-- Preserve active filters when searching -->
+          {% if active_meal_time %}<input
+            type="hidden"
+            name="meal_time"
+            value="{{ active_meal_time }}"
+          />{% endif %} {% if active_region %}<input
+            type="hidden"
+            name="region"
+            value="{{ active_region }}"
+          />{% endif %}
+        </div>
+        <button
+          type="submit"
+          class="px-5 py-3 bg-primary text-on-primary rounded-xl font-label-md hover:shadow-md transition-all"
+        >
+          Search
+        </button>
+      </form>
+
+      <div class="space-y-4">
+        <!-- Meal Time Filter Pills -->
+        <div class="flex items-center gap-3 overflow-x-auto pb-2">
+          <span class="font-label-md text-label-md text-outline shrink-0"
+            >Meal:</span
+          >
+
+          <a
+            href="?{% if active_region %}region={{ active_region }}&{% endif %}{% if active_search %}search={{ active_search }}&{% endif %}meal_time="
+            class="filter-pill shrink-0 px-5 py-2 rounded-full font-label-md whitespace-nowrap {% if not active_meal_time %}pill-active{% else %}bg-white border border-outline-variant hover:border-primary{% endif %}"
+          >
+            All
+          </a>
+
+          {% for mt in meal_time_options %}
+          <a
+            href="?{% if active_region %}region={{ active_region }}&{% endif %}{% if active_search %}search={{ active_search }}&{% endif %}meal_time={{ mt.value }}"
+            class="filter-pill shrink-0 px-5 py-2 rounded-full font-label-md whitespace-nowrap {% if active_meal_time == mt.value %}pill-active{% else %}bg-white border border-outline-variant hover:border-primary{% endif %}"
+          >
+            {{ mt.label }}
+          </a>
+          {% endfor %}
+        </div>
+
+        <!-- Region Filter Pills -->
+        <div class="flex items-center gap-3 overflow-x-auto pb-2">
+          <span class="font-label-md text-label-md text-outline shrink-0"
+            >Region:</span
+          >
+
+          <a
+            href="?{% if active_meal_time %}meal_time={{ active_meal_time }}&{% endif %}{% if active_search %}search={{ active_search }}&{% endif %}region="
+            class="filter-pill shrink-0 px-5 py-2 rounded-full font-label-md whitespace-nowrap {% if not active_region %}pill-active{% else %}bg-white border border-outline-variant hover:border-primary{% endif %}"
+          >
+            All
+          </a>
+
+          {% for rg in region_options %}
+          <a
+            href="?{% if active_meal_time %}meal_time={{ active_meal_time }}&{% endif %}{% if active_search %}search={{ active_search }}&{% endif %}region={{ rg.value }}"
+            class="filter-pill shrink-0 px-5 py-2 rounded-full font-label-md whitespace-nowrap {% if active_region == rg.value %}pill-active{% else %}bg-white border border-outline-variant hover:border-primary{% endif %}"
+          >
+            {{ rg.label }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Results count -->
+    <p class="mt-4 text-caption text-on-surface-variant">
+      Showing <strong>{{ meals|length }}</strong>
+      meal{{ meals|length|pluralize }}
+      {% if active_meal_time %}
+        for <strong>{{ active_meal_time|capfirst }}</strong>
+      {% endif %}
+      {% if active_region %}
+        in <strong>{{ active_region }}</strong> region
+      {% endif %}
+      {% if active_search %}
+        matching <strong>"{{ active_search }}"</strong>
+      {% endif %}
+    </p>
+  </section>
+
+  <!-- Meal Cards Grid -->
+  <section
+    class="px-margin-mobile md:px-margin-desktop py-stack-md max-w-container-max mx-auto"
+  >
+    <div
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter"
+    >
+      {% for meal in meals %}
+      <div
+        class="bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_20px_rgba(27,94,32,0.04)] hover:shadow-[0px_8px_30px_rgba(27,94,32,0.08)] transition-all flex flex-col h-full"
+      >
+        <div
+          class="relative h-48 overflow-hidden bg-surface-container flex items-center justify-center"
+        >
+          <span class="material-symbols-outlined text-6xl text-outline"
+            >restaurant</span
+          >
+          <div
+            class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1"
+          >
+            <span
+              class="material-symbols-outlined text-secondary text-[16px]"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >local_fire_department</span
+            >
+            <span class="font-label-md text-[12px] text-on-surface"
+              >{{ meal.calories }} kcal</span
+            >
+          </div>
+        </div>
+        <div class="p-stack-md flex flex-col flex-grow">
+          <div class="flex justify-between items-start mb-1">
+            <div>
+              <h3 class="font-headline-md text-[18px] text-primary">
+                {{ meal.name }}
+              </h3>
+              <p class="text-caption text-outline">{{ meal.region }}</p>
+            </div>
+            <span
+              class="bg-primary-fixed/30 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+              >{{ meal.meal_type }}</span
+            >
+          </div>
+          <div
+            class="mt-4 grid grid-cols-3 gap-2 py-3 border-y border-outline-variant/30"
+          >
+            <div class="text-center">
+              <p class="text-caption text-outline">Carbs</p>
+              <p class="font-label-md text-on-surface">{{ meal.carbs }}g</p>
+            </div>
+            <div class="text-center">
+              <p class="text-caption text-outline">Protein</p>
+              <p class="font-label-md text-on-surface">{{ meal.protein }}g</p>
+            </div>
+            <div class="text-center">
+              <p class="text-caption text-outline">Fat</p>
+              <p class="font-label-md text-on-surface">{{ meal.fat }}g</p>
+            </div>
+          </div>
+          <div class="mt-auto pt-4 flex gap-2">
+  <a href="{% url 'meal_detail' meal.id %}" class="flex-grow bg-primary text-white py-2.5 rounded-xl font-label-md text-label-md hover:bg-tertiary transition-colors flex items-center justify-center gap-2">
+    <span class="material-symbols-outlined text-[18px]">visibility</span>View
+  </a>
+  {% if swap_mode and active_meal_time %}
+  <a href="{% url 'swap_meal' meal.id %}?meal_time={{ active_meal_time }}"
+     class="w-auto px-3 border border-primary rounded-xl flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors font-label-md text-[11px] gap-1">
+    <span class="material-symbols-outlined text-[16px]">swap_horiz</span>Use
+  </a>
+  {% else %}
+  <a href="{% url 'add_to_plan' meal.id %}?next=recommendations"
+     class="w-11 h-11 border border-outline-variant rounded-xl flex items-center justify-center text-primary hover:bg-surface-container-low transition-colors">
+    <span class="material-symbols-outlined">add</span>
+  </a>
+  {% endif %}
+</div>
+        </div>
+      </div>
+
+      {% empty %}
+      <div
+        class="col-span-full flex flex-col items-center justify-center py-24 text-center"
+      >
+        <span class="material-symbols-outlined text-6xl text-outline mb-4"
+          >search_off</span
+        >
+        <h3 class="font-headline-md text-on-surface mb-2">No meals found</h3>
+        <p class="text-body-md text-on-surface-variant mb-6">
+          Try a different filter or search term.
+        </p>
+        <a
+          href="{% url 'recommendations' %}"
+          class="px-6 py-3 bg-primary text-on-primary rounded-xl font-label-md"
+          >Clear Filters</a
+        >
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+
+<!-- Bottom Nav (Mobile) -->
+<nav
+  class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 lg:hidden bg-surface shadow-lg rounded-t-xl"
+>
+  <a
+    class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform"
+    href="{% url 'dashboard' %}"
+  >
+    <span class="material-symbols-outlined">dashboard</span
+    ><span class="text-caption">Dashboard</span>
+  </a>
+  <a
+    class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform"
+    href="{% url 'recommendations' %}"
+  >
+    <span
+      class="material-symbols-outlined"
+      style="font-variation-settings: &quot;FILL&quot; 1"
+      >recommend</span
+    ><span class="text-caption">Recs</span>
+  </a>
+  <a
+    class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform"
+    href="{% url 'meal_plan' %}"
+  >
+    <span class="material-symbols-outlined">restaurant_menu</span
+    ><span class="text-caption">Plan</span>
+  </a>
+  <a
+    class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform"
+    href="{% url 'profile' %}"
+  >
+    <span class="material-symbols-outlined">person</span
+    ><span class="text-caption">Profile</span>
+  </a>
+</nav>
+
+<footer
+  class="lg:ml-64 w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest py-stack-lg"
+>
+  <div
+    class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-6"
+  >
+    <span class="font-headline-md text-headline-md text-primary mb-1"
+      >MyNaijaDiet</span
+    >
+    <p class="font-caption text-caption text-on-surface-variant">
+      &copy; 2026 MyNaijaDiet. Health is Wealth.
+    </p>
+  </div>
+</footer>
+{% endblock %}
