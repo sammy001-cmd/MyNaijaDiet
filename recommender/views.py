@@ -214,22 +214,32 @@ def dashboard(request):
     # ── Get or generate weekly plan ───────────────────────────────────────
     from .meal_planner import generate_weekly_plan, get_today_meals
 
-    plan         = generate_weekly_plan(user, profile, duration='1_week')
+    plan                    = generate_weekly_plan(user, profile, duration='1_week')
     today_meals, day_number = get_today_meals(plan)
 
-    breakfast_meal = today_meals.get('breakfast')
-    lunch_meal     = today_meals.get('lunch')
-    dinner_meal    = today_meals.get('dinner')
-    snack_meal     = today_meals.get('snack')
+    # ── Build meal_slots list for template ────────────────────────────────
+    SLOT_META = [
+        {'slot': 'breakfast', 'label': 'Breakfast', 'icon': 'egg_alt'},
+        {'slot': 'lunch',     'label': 'Lunch',     'icon': 'set_meal'},
+        {'slot': 'dinner',    'label': 'Dinner',    'icon': 'soup_kitchen'},
+        {'slot': 'snack',     'label': 'Snack',     'icon': 'bakery_dining'},
+    ]
 
-    # Plan summary
-    total_kcal = sum(
-        m.calories_kcal for m in [breakfast_meal, lunch_meal, dinner_meal, snack_meal] if m
-    )
-    total_protein = round(sum(
-        m.protein_g for m in [breakfast_meal, lunch_meal, dinner_meal, snack_meal] if m
-    ), 1)
+    meal_slots = []
+    for meta in SLOT_META:
+        meal = today_meals.get(meta['slot'])
+        meal_slots.append({
+            'slot':  meta['slot'],
+            'label': meta['label'],
+            'icon':  meta['icon'],
+            'meal':  meal,
+        })
 
+    # Plan summary totals
+    plan_total_kcal    = sum(s['meal'].calories_kcal for s in meal_slots if s['meal'])
+    plan_total_protein = round(sum(s['meal'].protein_g for s in meal_slots if s['meal']), 1)
+
+    # ── User initials ─────────────────────────────────────────────────────
     initials = f"{user.first_name[:1]}{user.last_name[:1]}".upper()
 
     context = {
@@ -239,7 +249,7 @@ def dashboard(request):
         'profile':              profile,
         'calorie_target':       f'{calorie_target:,}',
         'tdee':                 f'{tdee:,}',
-        'bmi_status':           profile.get_bmi_category(),
+        'bmi_status':           profile.get_bmi_category().upper(),
         'macro_protein_target': macro_protein_target,
         'macro_carb_target':    macro_carb_target,
         'macro_fat_target':     macro_fat_target,
@@ -247,12 +257,9 @@ def dashboard(request):
         'carb_pct':             carb_pct,
         'fat_pct':              fat_pct,
         'protein_carb_pct':     protein_carb_pct,
-        'breakfast_meal':       breakfast_meal,
-        'lunch_meal':           lunch_meal,
-        'dinner_meal':          dinner_meal,
-        'snack_meal':           snack_meal,
-        'plan_total_kcal':      total_kcal,
-        'plan_total_protein':   total_protein,
+        'meal_slots':           meal_slots,
+        'plan_total_kcal':      plan_total_kcal,
+        'plan_total_protein':   plan_total_protein,
         'active_plan':          plan,
     }
     return render(request, 'dashboard.html', context)

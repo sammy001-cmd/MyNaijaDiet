@@ -1,27 +1,19 @@
 """
-MyNaijaDiet — Weekly Meal Plan Generator
-==========================================
-Generates a full 7-day meal plan for a user based on their health profile.
+MyNaijaDiet — Weekly Meal Plan Generator v2
+=============================================
+Fixes from v1:
+  1. Day calculation uses plan offset (not isoweekday) — fixes "wrong day" bug
+  2. Variety rules — no same food family more than twice per week
+  3. No same base ingredient (e.g. Amala) more than once per day
+  4. Feedback-aware scoring — low-rated meals ranked lower
 
-Rules:
-- Each day has 4 meals: breakfast, lunch, dinner, snack
-- Each meal fits within the calorie budget for that slot
-- No meal repeats within the same week
-- Total daily calories stay within ±10% of user's target
-- Meals are picked from LightGBM-ranked list (best match for goal first)
-- Regional preferences respected where possible
-
-Plan durations:
-- 1 week  = 7 days
-- 2 weeks = 14 days
-- 1 month = 28 days
+Plan durations: 1 week (7 days), 2 weeks (14 days), 1 month (28 days)
 """
 
-from datetime import timedelta
+from datetime import timedelta, date
 from django.utils import timezone
 from .models import Meal, MealPlan, MealPlanEntry
 
-# Calorie split per meal slot
 SLOT_RATIOS = {
     'breakfast': 0.25,
     'lunch':     0.35,
@@ -29,44 +21,121 @@ SLOT_RATIOS = {
     'snack':     0.10,
 }
 
-TOLERANCE    = 0.28   # ±28% calorie tolerance per slot
+TOLERANCE = 0.28
+
 PLAN_LENGTHS = {
     '1_week':  7,
     '2_weeks': 14,
     '1_month': 28,
 }
 
+# Food family groups — meals sharing a base ingredient
+# Used to prevent e.g. Tuwo appearing 5x a week
+FOOD_FAMILIES = {
+    'amala':       ['amala'],
+    'eba':         ['eba', 'garri'],
+    'pounded_yam': ['pounded yam'],
+    'fufu':        ['fufu', 'akpu'],
+    'semo':        ['semo', 'semovita'],
+    'tuwo':        ['tuwo'],
+    'jollof':      ['jollof rice'],
+    'fried_rice':  ['fried rice'],
+    'indomie':     ['indomie'],
+    'spaghetti':   ['spaghetti'],
+    'bread':       ['bread'],
+    'yam':         ['yam and', 'yamarita', 'yam porridge', 'fried yam'],
+    'plantain':    ['fried plantain', 'plantain porridge', 'roasted plantain', 'bole'],
+    'beans':       ['beans', 'moi moi', 'akara'],
+}
 
-def _get_scored_meals(goal):
-    """Get all meals scored by LightGBM for this goal."""
-    from .models import Meal
+MAX_FAMILY_PER_WEEK = 2   # same food family max 2x per week
+MAX_FAMILY_PER_DAY  = 1   # same food family max 1x per day
+
+
+def _get_food_family(meal_name):
+    """Return the food family key for a meal name, or None."""
+    name_lower = meal_name.lower()
+    for family, keywords in FOOD_FAMILIES.items():
+        if any(kw in name_lower for kw in keywords):
+            return family
+    return None
+
+
+def _get_scored_meals(goal, user=None):
+    """
+    Get all meals scored by LightGBM.
+    If user provided, apply feedback penalty to low-rated meals.
+    """
     try:
         from .ml_engine import score_meals
         all_meals = Meal.objects.all()
         scored    = score_meals(goal, all_meals)
-        # Add unscored meals as fallback
-        scored_ids = {meal.id for meal, _ in scored}
-        extras     = [(m, 0.0) for m in Meal.objects.exclude(id__in=scored_ids)]
-        return scored + extras
     except Exception:
-        meals = list(Meal.objects.all())
         import random
+        meals = list(Meal.objects.all())
         random.shuffle(meals)
-        return [(m, 0.0) for m in meals]
+        scored = [(m, 0.5) for m in meals]
+
+    # Apply feedback penalty if user provided
+    if user:
+        try:
+            from .models import MealFeedback
+            feedback = {
+                f.meal_id: f.rating
+                for f in MealFeedback.objects.filter(user=user)
+            }
+            adjusted = []
+            for meal, score in scored:
+                rating  = feedback.get(meal.id)
+                if rating is not None:
+                    # Penalty: rating 1 → -0.3, rating 2 → -0.15,
+                    # rating 4 → +0.1, rating 5 → +0.2
+                    penalty = (rating - 3) * 0.075
+                    score   = max(0.0, min(1.0, score + penalty))
+                adjusted.append((meal, score))
+            adjusted.sort(key=lambda x: x[1], reverse=True)
+            return adjusted
+        except Exception:
+            pass
+
+    return scored
 
 
-def _pick_for_slot(slot, budget, scored_meals, used_ids):
+def _pick_for_slot(slot, budget, scored_meals, used_ids,
+                   week_family_count, day_family_set):
     """
-    Pick the best available meal for a slot.
-    - Highest LightGBM score
-    - Available at this meal time
-    - Fits calorie budget (±TOLERANCE)
-    - Not already used in this week's plan
+    Pick the best available meal for a slot respecting:
+    - Calorie budget (±TOLERANCE)
+    - Not already used (used_ids)
+    - Variety: food family not overused this week
+    - Variety: food family not repeated today
     """
     min_kcal = budget * (1 - TOLERANCE)
     max_kcal = budget * (1 + TOLERANCE)
 
-    # First pass: strict budget + available at this time
+    def is_variety_ok(meal):
+        family = _get_food_family(meal.food_name)
+        if family is None:
+            return True
+        if family in day_family_set:
+            return False   # already had this family today
+        if week_family_count.get(family, 0) >= MAX_FAMILY_PER_WEEK:
+            return False   # used this family too much this week
+        return True
+
+    # Pass 1: strict budget + variety
+    for meal, score in scored_meals:
+        if meal.id in used_ids:
+            continue
+        times = [t.strip() for t in meal.meal_time.split(',')]
+        if slot not in times:
+            continue
+        if not (min_kcal <= meal.calories_kcal <= max_kcal):
+            continue
+        if is_variety_ok(meal):
+            return meal
+
+    # Pass 2: relax variety constraint, keep budget
     for meal, score in scored_meals:
         if meal.id in used_ids:
             continue
@@ -76,7 +145,7 @@ def _pick_for_slot(slot, budget, scored_meals, used_ids):
         if min_kcal <= meal.calories_kcal <= max_kcal:
             return meal
 
-    # Second pass: ignore budget, just pick closest calorie match
+    # Pass 3: relax everything, just pick closest calorie match
     candidates = []
     for meal, score in scored_meals:
         if meal.id in used_ids:
@@ -96,36 +165,35 @@ def _pick_for_slot(slot, budget, scored_meals, used_ids):
 
 def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
     """
-    Generate a full meal plan for the specified duration.
+    Generate or retrieve a meal plan for the given duration.
 
-    Args:
-        user: User instance
-        profile: HealthProfile instance
-        duration: '1_week', '2_weeks', or '1_month'
-        regenerate: if True, delete existing plan and create fresh one
-
-    Returns:
-        MealPlan instance
+    Day numbering: day 1 = plan start date, day 2 = next day, etc.
+    This is independent of weekday — avoids the isoweekday bug.
     """
     today      = timezone.now().date()
     num_days   = PLAN_LENGTHS.get(duration, 7)
     start_date = today
     end_date   = today + timedelta(days=num_days - 1)
 
-    # ── Delete existing plan if regenerating ──────────────────────────────
+    # Delete existing if regenerating
     if regenerate:
         MealPlan.objects.filter(user=user, is_active=True).delete()
 
-    # ── Check if active plan already exists ───────────────────────────────
+    # Return existing plan if it covers today
     existing = MealPlan.objects.filter(
-        user      = user,
-        is_active = True,
-    ).prefetch_related('entries').first()
+        user        = user,
+        is_active   = True,
+        start_date__lte = today,
+        end_date__gte   = today,
+    ).first()
 
     if existing and not regenerate:
         return existing
 
-    # ── Create new plan ───────────────────────────────────────────────────
+    # Deactivate any stale plans
+    MealPlan.objects.filter(user=user, is_active=True).update(is_active=False)
+
+    # Create new plan
     plan = MealPlan.objects.create(
         user       = user,
         plan_name  = f'{num_days}-Day Meal Plan',
@@ -134,27 +202,39 @@ def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
         is_active  = True,
     )
 
-    daily_target  = int(profile.get_daily_calorie_target())
-    goal          = profile.health_goal
-    scored_meals  = _get_scored_meals(goal)
-    used_ids      = set()   # track meals used across entire plan (no repeats)
+    daily_target      = int(profile.get_daily_calorie_target())
+    goal              = profile.health_goal
+    scored_meals      = _get_scored_meals(goal, user=user)
+    used_ids          = set()           # meals used across whole plan
+    week_family_count = {}              # food family usage this week
 
     entries_to_create = []
 
     for day_offset in range(num_days):
-        day_number   = day_offset + 1   # 1-based day number
-        day_used_ids = set()            # meals used today only
+        day_number      = day_offset + 1
+        day_used_ids    = set()
+        day_family_set  = set()
+
+        # Reset week family count every 7 days
+        if day_offset % 7 == 0:
+            week_family_count = {}
 
         for slot, ratio in SLOT_RATIOS.items():
-            budget = daily_target * ratio
-
-            # Exclude meals used today AND across whole plan
+            budget   = daily_target * ratio
             excluded = used_ids | day_used_ids
 
-            meal = _pick_for_slot(slot, budget, scored_meals, excluded)
+            meal = _pick_for_slot(
+                slot, budget, scored_meals, excluded,
+                week_family_count, day_family_set
+            )
 
             if meal:
                 day_used_ids.add(meal.id)
+                family = _get_food_family(meal.food_name)
+                if family:
+                    day_family_set.add(family)
+                    week_family_count[family] = week_family_count.get(family, 0) + 1
+
                 entries_to_create.append(
                     MealPlanEntry(
                         meal_plan    = plan,
@@ -165,59 +245,72 @@ def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
                     )
                 )
 
-        # After each day, add today's meals to the global used set
         used_ids |= day_used_ids
 
-        # If we run out of unique meals (unlikely with 371), reset used_ids
-        # but keep today's to avoid same-day repeats
-        if len(used_ids) > len(scored_meals) * 0.8:
-            used_ids = day_used_ids.copy()
+        # Reset used_ids after 2 weeks to allow repetition in long plans
+        if day_offset == 13:
+            used_ids = set()
 
-    # Bulk create all entries at once for performance
     MealPlanEntry.objects.bulk_create(entries_to_create)
-
     return plan
+
+
+def get_today_meals(plan):
+    """
+    Get today's 4 meals using plan-relative day number.
+    day 1 = plan start date. No isoweekday used.
+    """
+    today      = timezone.now().date()
+    day_number = (today - plan.start_date).days + 1
+
+    # Safety check — if today is outside plan range
+    if day_number < 1:
+        day_number = 1
+    total_days = (plan.end_date - plan.start_date).days + 1
+    if day_number > total_days:
+        day_number = total_days
+
+    entries = MealPlanEntry.objects.filter(
+        meal_plan = plan,
+        day       = day_number,
+    ).select_related('meal')
+
+    result = {'breakfast': None, 'lunch': None, 'dinner': None, 'snack': None}
+    for entry in entries:
+        if entry.meal_time in result:
+            result[entry.meal_time] = entry.meal
+
+    return result, day_number
 
 
 def get_week_plan_display(plan, week_offset=0):
     """
-    Get meal entries for a specific week within a plan, grouped by day.
-
-    Args:
-        plan: MealPlan instance
-        week_offset: 0 = current week, 1 = next week, etc.
-
-    Returns:
-        list of 7 dicts, each with:
-            day_number, date, day_name,
-            breakfast, lunch, dinner, snack,
-            total_kcal, is_today
+    Get 7 days of the plan for display in the weekly calendar.
+    week_offset=0 = first 7 days of plan, week_offset=1 = days 8-14, etc.
     """
-    from datetime import date
-
-    today      = timezone.now().date()
-    start_day  = (week_offset * 7) + 1
-    end_day    = start_day + 6
+    today     = timezone.now().date()
+    start_day = (week_offset * 7) + 1
+    end_day   = start_day + 6
 
     entries = MealPlanEntry.objects.filter(
-        meal_plan__in = [plan],
-        day__gte      = start_day,
-        day__lte      = end_day,
+        meal_plan = plan,
+        day__gte  = start_day,
+        day__lte  = end_day,
     ).select_related('meal')
 
-    # Group entries by day
+    # Group by day
     day_entries = {}
     for entry in entries:
         if entry.day not in day_entries:
             day_entries[entry.day] = {}
         day_entries[entry.day][entry.meal_time] = entry.meal
 
-    # Build display list
     days_display = []
-    day_names    = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    day_names    = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
+                    'Friday', 'Saturday', 'Sunday']
 
     for i, day_num in enumerate(range(start_day, end_day + 1)):
-        meals   = day_entries.get(day_num, {})
+        meals    = day_entries.get(day_num, {})
         day_date = plan.start_date + timedelta(days=day_num - 1)
 
         breakfast = meals.get('breakfast')
@@ -244,35 +337,15 @@ def get_week_plan_display(plan, week_offset=0):
     return days_display
 
 
-def get_today_meals(plan):
-    """
-    Get today's 4 meals from the active plan.
-    Returns dict: {breakfast: Meal, lunch: Meal, dinner: Meal, snack: Meal}
-    """
-    today      = timezone.now().date()
-    day_number = (today - plan.start_date).days + 1
-
-    entries = MealPlanEntry.objects.filter(
-        meal_plan = plan,
-        day       = day_number,
-    ).select_related('meal')
-
-    result = {'breakfast': None, 'lunch': None, 'dinner': None, 'snack': None}
-    for entry in entries:
-        if entry.meal_time in result:
-            result[entry.meal_time] = entry.meal
-
-    return result, day_number
-
-
 def swap_meal_in_plan(user, meal_time, new_meal):
     """Replace a meal in today's active plan."""
-    today      = timezone.now().date()
-    day_number = None
+    today = timezone.now().date()
 
     plan = MealPlan.objects.filter(
-        user      = user,
-        is_active = True,
+        user            = user,
+        is_active       = True,
+        start_date__lte = today,
+        end_date__gte   = today,
     ).first()
 
     if not plan:
@@ -280,10 +353,27 @@ def swap_meal_in_plan(user, meal_time, new_meal):
 
     day_number = (today - plan.start_date).days + 1
 
-    entry, created = MealPlanEntry.objects.update_or_create(
+    entry, _ = MealPlanEntry.objects.update_or_create(
         meal_plan = plan,
         day       = day_number,
         meal_time = meal_time,
         defaults  = {'meal': new_meal}
     )
     return entry
+
+
+def get_plan_summary(meal_dict):
+    """Calculate total nutrition for a set of meals."""
+    total_kcal = total_protein = total_carbs = total_fat = 0
+    for meal in meal_dict.values():
+        if meal:
+            total_kcal    += meal.calories_kcal
+            total_protein += meal.protein_g
+            total_carbs   += meal.carb_g
+            total_fat     += meal.fat_g
+    return {
+        'total_kcal':    round(total_kcal),
+        'total_protein': round(total_protein, 1),
+        'total_carbs':   round(total_carbs, 1),
+        'total_fat':     round(total_fat, 1),
+    }
