@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib import messages
+from django.db.models import Avg, Count
 from django.utils import timezone
-from .models import User, HealthProfile, Meal, MealPlan, MealPlanEntry, Recommendation, MealFeedback
+from .models import User, HealthProfile, Meal, MealPlan, MealPlanEntry, Recommendation, MealFeedback, MealFeedback, MealEdit
+from .forms import MealEditForm
 
 
 # ============================================================
@@ -67,8 +69,8 @@ def register(request):
         goal_map = {
             'weight_loss':  'weight_loss',
             'maintenance':  'maintenance',
-            'weight_gain':  'muscle_gain',   # template says weight_gain, model uses muscle_gain
-            'muscle_gain':  'muscle_gain',
+            'weight_gain':  'weight_gain',   # template says weight_gain, model uses weight_gain
+            
         }
         health_goal = goal_map.get(goal, 'maintenance')
 
@@ -137,20 +139,25 @@ def register(request):
 
 def login_view(request):
     """
-    Email + password login.
+    Email + password login with role-based redirects.
     """
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('admin_dashboard')
         return redirect('dashboard')
 
     if request.method == 'POST':
-        email    = request.POST.get('email', '').strip().lower()
+        email = request.POST.get('email', '').strip().lower()
         password = request.POST.get('password', '')
 
         user = authenticate(request, username=email, password=password)
 
         if user is not None:
             login(request, user)
-            # Redirect to the page they were trying to access, or dashboard
+
+            if user.is_staff or user.is_superuser:
+                return redirect('admin_dashboard')
+
             next_url = request.GET.get('next', 'dashboard')
             return redirect(next_url)
         else:
@@ -198,7 +205,7 @@ def dashboard(request):
 
     if profile.health_goal == 'weight_loss':
         p_ratio, c_ratio, f_ratio = 0.35, 0.40, 0.25
-    elif profile.health_goal == 'muscle_gain':
+    elif profile.health_goal == 'weight_gain':
         p_ratio, c_ratio, f_ratio = 0.35, 0.45, 0.20
     else:
         p_ratio, c_ratio, f_ratio = 0.25, 0.50, 0.25
@@ -212,10 +219,20 @@ def dashboard(request):
     protein_carb_pct     = protein_pct + carb_pct
 
     # ── Get or generate weekly plan ───────────────────────────────────────
-    from .meal_planner import generate_weekly_plan, get_today_meals
+    from .meal_planner import generate_weekly_plan, get_today_meals, get_match_reason
+    from .models import MealPlanEntry
 
     plan                    = generate_weekly_plan(user, profile, duration='1_week')
     today_meals, day_number = get_today_meals(plan)
+
+    # ── Pull today's entries too, so we get match_score alongside the meal ──
+    # (get_today_meals only returns Meal objects — score lives on the entry)
+    today_entries = MealPlanEntry.objects.filter(
+        meal_plan = plan,
+        day       = day_number,
+    ).select_related('meal')
+
+    entry_by_slot = {entry.meal_time: entry for entry in today_entries}
 
     # ── Build meal_slots list for template ────────────────────────────────
     SLOT_META = [
@@ -227,12 +244,21 @@ def dashboard(request):
 
     meal_slots = []
     for meta in SLOT_META:
-        meal = today_meals.get(meta['slot'])
+        meal  = today_meals.get(meta['slot'])
+        entry = entry_by_slot.get(meta['slot'])
+
+        match_score  = entry.match_score if entry else None
+        match_reason = None
+        if meal and match_score is not None:
+            match_reason = get_match_reason(meal, match_score, profile.health_goal)
+
         meal_slots.append({
-            'slot':  meta['slot'],
-            'label': meta['label'],
-            'icon':  meta['icon'],
-            'meal':  meal,
+            'slot':         meta['slot'],
+            'label':        meta['label'],
+            'icon':         meta['icon'],
+            'meal':         meal,
+            'match_score':  match_score,
+            'match_reason': match_reason,
         })
 
     # Plan summary totals
@@ -306,7 +332,7 @@ def meal_plan(request):
 
     if profile.health_goal == 'weight_loss':
         p_ratio, c_ratio, f_ratio = 0.35, 0.40, 0.25
-    elif profile.health_goal == 'muscle_gain':
+    elif profile.health_goal == 'weight_gain':
         p_ratio, c_ratio, f_ratio = 0.35, 0.45, 0.20
     else:
         p_ratio, c_ratio, f_ratio = 0.25, 0.50, 0.25
@@ -365,25 +391,34 @@ def recommendations(request):
     search_query     = request.GET.get('search', '').strip()
     swap_mode        = request.GET.get('swap', '') == 'true'
 
-    meals = Meal.objects.all()
+    meals_qs = Meal.objects.all()
 
     if meal_time_filter:
-        meals = meals.filter(meal_time__icontains=meal_time_filter)
+        meals_qs = meals_qs.filter(meal_time__icontains=meal_time_filter)
     if region_filter:
-        meals = meals.filter(region__icontains=region_filter)
+        meals_qs = meals_qs.filter(region__icontains=region_filter)
     if search_query:
-        meals = meals.filter(food_name__icontains=search_query)
+        meals_qs = meals_qs.filter(food_name__icontains=search_query)
 
-    # ML ranking
+    # ── Scoring — same source as the meal planner, so scores are consistent
+    # app-wide rather than coming from two different ranking paths. ─────────
+    from .meal_planner import _get_scored_meals, get_match_reason
+
     try:
-        from .ml_engine import get_recommendations as ml_rank
-        meals = ml_rank(
-            user_goal      = profile.health_goal,
-            meals_queryset = meals,
-            top_n          = 100,
-        )
+        all_scored = _get_scored_meals(profile.health_goal, user=user)
+        # Filter scored list down to the queryset's ids, preserving score order
+        allowed_ids = set(meals_qs.values_list('id', flat=True))
+        scored_filtered = [(m, s) for m, s in all_scored if m.id in allowed_ids]
     except Exception:
-        meals = list(meals.order_by('food_name'))
+        scored_filtered = [(m, 0.5) for m in meals_qs.order_by('food_name')]
+
+    # Attach score + reason directly onto each meal object so the template
+    # can read meal.match_score / meal.match_reason without extra plumbing.
+    meals = []
+    for meal, score in scored_filtered[:100]:
+        meal.match_score  = score
+        meal.match_reason = get_match_reason(meal, score, profile.health_goal)
+        meals.append(meal)
 
     meal_time_options = [
         {'value': 'breakfast', 'label': 'Breakfast'},
@@ -420,11 +455,6 @@ def recommendations(request):
 
 @login_required
 def meal_detail(request, meal_id=None):
-    """
-    Shows full details for a single meal.
-    Also calculates macro percentages for the visual bars
-    and fetches similar meals (same goal + diet_type).
-    """
     if meal_id:
         meal = get_object_or_404(Meal, id=meal_id)
     else:
@@ -444,18 +474,24 @@ def meal_detail(request, meal_id=None):
         protein_pct = carb_pct = fat_pct = 0
 
     # ── Similar meals ─────────────────────────────────────────────────────
-    # Same goal and diet_type, excluding current meal, max 3
     similar_meals = Meal.objects.filter(
         goal_suitability = meal.goal_suitability,
         diet_type        = meal.diet_type,
     ).exclude(id=meal.id).order_by('?')[:3]
 
+    # ── Feedback ─────────────────────────────────────────────────────────
+    existing_feedback = MealFeedback.objects.filter(user=request.user, meal=meal).first()
+    feedback_stats = meal.feedbacks.aggregate(avg_rating=Avg('rating'), count=Count('id'))
+
     context = {
-        'meal':          meal,
-        'protein_pct':   protein_pct,
-        'carb_pct':      carb_pct,
-        'fat_pct':       fat_pct,
-        'similar_meals': similar_meals,
+        'meal':              meal,
+        'protein_pct':       protein_pct,
+        'carb_pct':          carb_pct,
+        'fat_pct':           fat_pct,
+        'similar_meals':     similar_meals,
+        'existing_feedback': existing_feedback,
+        'avg_rating':        feedback_stats['avg_rating'],
+        'feedback_count':    feedback_stats['count'],
     }
 
     return render(request, 'meal_detail.html', context)
@@ -568,8 +604,8 @@ def profile(request):
         goal_map = {
             'weight_loss': 'weight_loss',
             'maintenance': 'maintenance',
-            'muscle_gain': 'muscle_gain',
-            'weight_gain': 'muscle_gain',
+            'weight_gain': 'weight_gain',
+            'weight_gain': 'weight_gain',
         }
 
         # Activity level — template now sends exact model values
@@ -640,3 +676,274 @@ def profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+
+@login_required
+def submit_meal_feedback(request, meal_id):
+    if request.method != 'POST':
+        return redirect('meal_detail', meal_id=meal_id)
+
+    meal = get_object_or_404(Meal, id=meal_id)
+    rating = request.POST.get('rating')
+    was_cooked = request.POST.get('was_cooked') == 'on'
+    comment = request.POST.get('comment', '').strip()
+
+    if not rating:
+        messages.error(request, 'Please select a rating before submitting.')
+        return redirect('meal_detail', meal_id=meal_id)
+
+    feedback, created = MealFeedback.objects.update_or_create(
+        user=request.user,
+        meal=meal,
+        defaults={
+            'rating': int(rating),
+            'was_cooked': was_cooked,
+            'comment': comment,
+        }
+    )
+
+    if created:
+        messages.success(request, f'Thanks for rating {meal.food_name}!')
+    else:
+        messages.success(request, f'Your feedback for {meal.food_name} was updated.')
+
+    return redirect('meal_detail', meal_id=meal_id)
+
+
+
+
+
+
+def _staff_required(user):
+    return user.is_authenticated and user.is_staff
+
+
+def _superuser_required(user):
+    return user.is_authenticated and user.is_superuser
+
+
+# ── Admin dashboard home ──────────────────────────────────────────────────
+@login_required
+@user_passes_test(_staff_required)
+def admin_dashboard(request):
+    context = {
+        'active':            'dashboard',
+        'total_meals':       Meal.objects.count(),
+        'total_users':       User.objects.filter(is_staff=False).count(),
+        'pending_count':     MealEdit.objects.filter(status='pending').count(),
+        'my_pending':        MealEdit.objects.filter(submitted_by=request.user, status='pending').count(),
+        'avg_rating':        MealFeedback.objects.aggregate(avg=Avg('rating'))['avg'],
+        'feedback_count':    MealFeedback.objects.count(),
+        'recent_proposals':  MealEdit.objects.order_by('-created_at')[:6],
+    }
+    return render(request, 'staff/admin_dashboard.html', context)
+
+
+# ── Meal Management — browse all meals with edit/delete/image actions ─────
+@login_required
+@user_passes_test(_staff_required)
+def meal_management(request):
+    search = request.GET.get('search', '').strip()
+    meals  = Meal.objects.all().order_by('food_name')
+    if search:
+        meals = meals.filter(food_name__icontains=search)
+
+    context = {
+        'meals':         meals,
+        'active':        'meals',
+        'search':        search,
+        'pending_count': MealEdit.objects.filter(status='pending').count(),
+    }
+    return render(request, 'staff/meal_management.html', context)
+
+
+# ── Staff: view their own proposal queue ─────────────────────────────────
+@login_required
+@user_passes_test(_staff_required)
+def meal_edit_queue(request):
+    my_edits = MealEdit.objects.filter(submitted_by=request.user).order_by('-created_at')
+    context = {
+        'my_edits':      my_edits,
+        'active':        'queue',
+        'pending_count': MealEdit.objects.filter(status='pending').count(),
+    }
+    return render(request, 'staff/meal_edit_queue.html', context)
+
+
+def _extract_image(cleaned_data):
+    """Pull the uploaded image out of form data — it can't go in JSON payload."""
+    image = cleaned_data.pop('image', None)
+    return cleaned_data, image
+
+
+# ── Staff: propose a brand new meal ───────────────────────────────────────
+@login_required
+@user_passes_test(_staff_required)
+def propose_new_meal(request):
+    if request.method == 'POST':
+        form = MealEditForm(request.POST, request.FILES)
+        if form.is_valid():
+            payload, image = _extract_image(form.cleaned_data)
+            MealEdit.objects.create(
+                action        = 'create',
+                payload       = payload,
+                image         = image,
+                submitted_by  = request.user,
+            )
+            messages.success(request, 'New meal proposal submitted for review.')
+            return redirect('meal_edit_queue')
+    else:
+        form = MealEditForm()
+
+    context = {'form': form, 'mode': 'create', 'active': 'queue'}
+    return render(request, 'staff/propose_meal_edit.html', context)
+
+
+# ── Staff: propose an edit to an existing meal ────────────────────────────
+@login_required
+@user_passes_test(_staff_required)
+def propose_meal_update(request, meal_id):
+    meal = get_object_or_404(Meal, id=meal_id)
+
+    if request.method == 'POST':
+        form = MealEditForm(request.POST, request.FILES)
+        if form.is_valid():
+            payload, image = _extract_image(form.cleaned_data)
+            MealEdit.objects.create(
+                action        = 'update',
+                target_meal   = meal,
+                payload       = payload,
+                image         = image,
+                submitted_by  = request.user,
+            )
+            messages.success(request, f'Edit proposal for "{meal.food_name}" submitted for review.')
+            return redirect('meal_edit_queue')
+    else:
+        form = MealEditForm(initial={
+            'food_name':        meal.food_name,
+            'category':         meal.category,
+            'region':           meal.region,
+            'meal_time':        meal.meal_time,
+            'calories_kcal':    meal.calories_kcal,
+            'protein_g':        meal.protein_g,
+            'carb_g':           meal.carb_g,
+            'fat_g':            meal.fat_g,
+            'goal_suitability': meal.goal_suitability,
+            'diet_type':        meal.diet_type,
+            'taste_profile':    meal.taste_profile,
+            'prep_time':        meal.prep_time,
+            'price_range':      meal.price_range,
+        })
+
+    context = {'form': form, 'mode': 'update', 'meal': meal, 'active': 'meals'}
+    return render(request, 'staff/propose_meal_edit.html', context)
+
+
+# ── Staff: propose a deletion ──────────────────────────────────────────────
+@login_required
+@user_passes_test(_staff_required)
+def propose_meal_delete(request, meal_id):
+    meal = get_object_or_404(Meal, id=meal_id)
+
+    if request.method == 'POST':
+        MealEdit.objects.create(
+            action        = 'delete',
+            target_meal   = meal,
+            submitted_by  = request.user,
+        )
+        messages.success(request, f'Deletion proposal for "{meal.food_name}" submitted for review.')
+        return redirect('meal_edit_queue')
+
+    context = {'meal': meal, 'active': 'meals'}
+    return render(request, 'staff/confirm_delete_proposal.html', context)
+
+
+# ── Superuser: instant edit — no approval needed for your own changes ─────
+@login_required
+@user_passes_test(_superuser_required)
+def superuser_edit_meal(request, meal_id):
+    meal = get_object_or_404(Meal, id=meal_id)
+
+    if request.method == 'POST':
+        form = MealEditForm(request.POST, request.FILES)
+        if form.is_valid():
+            payload, image = _extract_image(form.cleaned_data)
+            for field, value in payload.items():
+                setattr(meal, field, value)
+            if image:
+                meal.image = image
+            meal.save()
+            messages.success(request, f'"{meal.food_name}" updated.')
+            return redirect('meal_management')
+    else:
+        form = MealEditForm(initial={
+            'food_name':        meal.food_name,
+            'category':         meal.category,
+            'region':           meal.region,
+            'meal_time':        meal.meal_time,
+            'calories_kcal':    meal.calories_kcal,
+            'protein_g':        meal.protein_g,
+            'carb_g':           meal.carb_g,
+            'fat_g':            meal.fat_g,
+            'goal_suitability': meal.goal_suitability,
+            'diet_type':        meal.diet_type,
+            'taste_profile':    meal.taste_profile,
+            'prep_time':        meal.prep_time,
+            'price_range':      meal.price_range,
+        })
+
+    context = {'form': form, 'mode': 'update', 'meal': meal, 'active': 'meals', 'instant': True}
+    return render(request, 'staff/propose_meal_edit.html', context)
+
+
+# ── Superuser: instant delete ──────────────────────────────────────────────
+@login_required
+@user_passes_test(_superuser_required)
+def superuser_delete_meal(request, meal_id):
+    meal = get_object_or_404(Meal, id=meal_id)
+    if request.method == 'POST':
+        name = meal.food_name
+        meal.delete()
+        messages.success(request, f'"{name}" deleted.')
+    return redirect('meal_management')
+
+
+# ── Superadmin: review queue ──────────────────────────────────────────────
+@login_required
+@user_passes_test(_superuser_required)
+def review_queue(request):
+    pending  = MealEdit.objects.filter(status='pending').order_by('created_at')
+    recent   = MealEdit.objects.exclude(status='pending').order_by('-reviewed_at')[:20]
+    context  = {
+        'pending':        pending,
+        'recent':         recent,
+        'active':         'review',
+        'pending_count':  pending.count(),
+    }
+    return render(request, 'staff/review_queue.html', context)
+
+
+# ── Superadmin: approve one proposal ──────────────────────────────────────
+@login_required
+@user_passes_test(_superuser_required)
+def approve_edit(request, edit_id):
+    edit = get_object_or_404(MealEdit, id=edit_id, status='pending')
+    if request.method == 'POST':
+        try:
+            edit.apply(reviewer=request.user)
+            messages.success(request, 'Change approved and applied to the live dataset.')
+        except Exception as e:
+            messages.error(request, f'Failed to apply change: {e}')
+    return redirect('review_queue')
+
+
+# ── Superadmin: reject one proposal ───────────────────────────────────────
+@login_required
+@user_passes_test(_superuser_required)
+def reject_edit(request, edit_id):
+    edit = get_object_or_404(MealEdit, id=edit_id, status='pending')
+    if request.method == 'POST':
+        notes = request.POST.get('notes', '')
+        edit.reject(reviewer=request.user, notes=notes)
+        messages.warning(request, 'Proposal rejected.')
+    return redirect('review_queue')

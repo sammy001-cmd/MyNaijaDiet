@@ -2,78 +2,101 @@
 {% block title %}My Meal Plan | MyNaijaDiet{% endblock %}
 
 {% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    .progress-glow { box-shadow: 0 0 12px rgba(145, 215, 138, 0.4); }
-    .day-card:hover { transform: translateY(-2px); }
-    .today-card { border: 2px solid var(--md-sys-color-primary, #1b5e20); }
+    :root {
+        --forest:      #0F3D13;
+        --forest-soft: #E8F0E6;
+        --gold:        #F9A825;
+        --pepper:      #C1440E;
+        --pepper-soft: #FBEAE0;
+        --parchment:   #FBF8F2;
+        --ink:         #1C1C1A;
+        --ink-soft:    #6B6560;
+    }
+
+    body { background: var(--parchment) !important; }
+    .font-display { font-family: 'Fraunces', serif; }
+    .font-body    { font-family: 'Inter', sans-serif; }
+
+    .progress-glow { box-shadow: 0 0 12px rgba(193, 68, 14, 0.25); }
+    .day-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .day-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,61,19,0.08); }
+    .today-card { border: 2px solid var(--forest); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .day-card { transition: none !important; }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
-<aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant bg-surface-container-low fixed left-0 top-0 w-64 z-50">
-  <div class="mb-stack-lg">
-    <h1 class="font-headline-md text-headline-md text-primary font-bold">MyNaijaDiet</h1>
-    <p class="font-label-md text-label-md text-on-surface-variant opacity-70">Premium Nutrition</p>
+<aside class="hidden lg:flex flex-col h-screen px-4 py-6 border-r border-outline-variant/20 bg-white fixed left-0 top-0 w-64 z-50 font-body">
+  <div class="mb-10 px-2">
+    <div class="flex items-center gap-2 mb-1">
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm" style="background: var(--forest);">
+        <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">eco</span>
+      </div>
+      <h1 class="font-display font-semibold text-xl tracking-tight" style="color: var(--forest);">MyNaijaDiet</h1>
+    </div>
+    <p class="text-xs text-on-surface-variant px-10">Premium Nutrition</p>
   </div>
-  <nav class="flex flex-col gap-2 grow">
-    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'dashboard' %}">
-      <span class="material-symbols-outlined">dashboard</span><span class="font-label-md">Dashboard</span>
+  <nav class="flex flex-col gap-1.5 grow">
+    <a class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-low transition-all" href="{% url 'dashboard' %}">
+      <span class="material-symbols-outlined text-[20px]">dashboard</span>Dashboard
     </a>
-    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'recommendations' %}">
-      <span class="material-symbols-outlined">recommend</span><span class="font-label-md">Recommendations</span>
+    <a class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-low transition-all" href="{% url 'recommendations' %}">
+      <span class="material-symbols-outlined text-[20px]">recommend</span>Recommendations
     </a>
-    <a class="flex items-center gap-stack-md bg-primary-container text-on-primary-container rounded-lg px-4 py-3 transition-colors" href="{% url 'meal_plan' %}">
-      <span class="material-symbols-outlined">restaurant_menu</span><span class="font-label-md">Meal Plan</span>
+    <a class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all" style="background: var(--forest-soft); color: var(--forest);" href="{% url 'meal_plan' %}">
+      <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">restaurant_menu</span>Meal Plan
     </a>
-    <a class="flex items-center gap-stack-md text-on-surface-variant hover:bg-surface-container-high rounded-lg px-4 py-3 transition-colors" href="{% url 'profile' %}">
-      <span class="material-symbols-outlined">person</span><span class="font-label-md">Profile</span>
+    <a class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-low transition-all" href="{% url 'profile' %}">
+      <span class="material-symbols-outlined text-[20px]">person</span>Profile
     </a>
   </nav>
 </aside>
 
-<main class="lg:ml-64 min-h-screen pb-40">
+<main class="lg:ml-64 min-h-screen pb-40 font-body">
 
-  <!-- Header -->
-  <header class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 sticky top-0 z-40 bg-surface shadow-sm lg:hidden">
-    <span class="font-headline-md text-headline-md font-bold text-primary">MyNaijaDiet</span>
-    <div class="flex gap-4">
-      <span class="material-symbols-outlined text-primary">notifications</span>
-    </div>
+  <header class="flex justify-between items-center w-full px-4 py-3 sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-outline-variant/20 lg:hidden">
+    <span class="font-display font-semibold text-lg tracking-tight" style="color: var(--forest);">MyNaijaDiet</span>
+    <span class="material-symbols-outlined" style="color: var(--forest);">notifications</span>
   </header>
 
   <!-- Page Header -->
-  <section class="px-margin-mobile md:px-margin-desktop pt-stack-lg pb-stack-md max-w-container-max mx-auto">
+  <section class="px-4 md:px-8 pt-8 pb-5 max-w-6xl mx-auto">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h2 class="font-headline-lg text-headline-lg text-primary">{{ plan.plan_name }}</h2>
-        <p class="font-body-md text-on-surface-variant">
+        <h2 class="font-display font-semibold text-3xl md:text-4xl tracking-tight" style="color: var(--ink);">{{ plan.plan_name }}</h2>
+        <p class="text-sm mt-1.5" style="color: var(--ink-soft);">
           {{ plan.start_date }} → {{ plan.end_date }}
           &nbsp;·&nbsp;
-          <span class="text-primary font-bold">{{ calorie_target }} kcal/day target</span>
+          <span class="font-bold" style="color: var(--forest);">{{ calorie_target }} kcal/day target</span>
         </p>
       </div>
       <div class="flex gap-3 flex-wrap">
-        <!-- Duration selector -->
         <div class="flex gap-2">
           <a href="?duration=1_week"
-             class="px-4 py-2 rounded-full text-caption font-bold border transition-all
-             {% if duration == '1_week' %}bg-primary text-on-primary border-primary{% else %}border-outline-variant text-on-surface-variant hover:border-primary{% endif %}">
+             class="px-4 py-2 rounded-full text-xs font-bold border transition-all"
+             style="{% if duration == '1_week' %}background: var(--forest); color: white; border-color: var(--forest);{% else %}border-color: rgba(0,0,0,0.12); color: var(--ink-soft);{% endif %}">
             1 Week
           </a>
           <a href="?duration=2_weeks"
-             class="px-4 py-2 rounded-full text-caption font-bold border transition-all
-             {% if duration == '2_weeks' %}bg-primary text-on-primary border-primary{% else %}border-outline-variant text-on-surface-variant hover:border-primary{% endif %}">
+             class="px-4 py-2 rounded-full text-xs font-bold border transition-all"
+             style="{% if duration == '2_weeks' %}background: var(--forest); color: white; border-color: var(--forest);{% else %}border-color: rgba(0,0,0,0.12); color: var(--ink-soft);{% endif %}">
             2 Weeks
           </a>
           <a href="?duration=1_month"
-             class="px-4 py-2 rounded-full text-caption font-bold border transition-all
-             {% if duration == '1_month' %}bg-primary text-on-primary border-primary{% else %}border-outline-variant text-on-surface-variant hover:border-primary{% endif %}">
+             class="px-4 py-2 rounded-full text-xs font-bold border transition-all"
+             style="{% if duration == '1_month' %}background: var(--forest); color: white; border-color: var(--forest);{% else %}border-color: rgba(0,0,0,0.12); color: var(--ink-soft);{% endif %}">
             1 Month
           </a>
         </div>
-        <!-- Regenerate -->
         <a href="?regenerate=true&duration={{ duration }}"
-           class="flex items-center gap-2 px-4 py-2 border border-outline text-on-surface-variant rounded-full font-label-md hover:bg-surface-container-low transition-colors"
+           class="flex items-center gap-2 px-4 py-2 border rounded-full text-xs font-bold hover:bg-surface-container-low transition-colors"
+           style="border-color: rgba(0,0,0,0.15); color: var(--ink-soft);"
            onclick="return confirm('Regenerate your entire meal plan? This cannot be undone.')">
           <span class="material-symbols-outlined text-[18px]">refresh</span>Regenerate
         </a>
@@ -82,50 +105,48 @@
   </section>
 
   <!-- Weekly Calendar -->
-  <section class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+  <section class="px-4 md:px-8 max-w-6xl mx-auto">
 
-    <!-- Week navigation -->
     <div class="flex items-center justify-between mb-6">
       {% if week_offset > 0 %}
-      <a href="?week={{ week_offset|add:'-1' }}&duration={{ duration }}"
-         class="flex items-center gap-1 text-primary font-label-md hover:underline">
+      <a href="?week={{ week_offset|add:'-1' }}&duration={{ duration }}" class="flex items-center gap-1 font-bold text-sm hover:underline" style="color: var(--forest);">
         <span class="material-symbols-outlined text-[18px]">chevron_left</span>Previous Week
       </a>
       {% else %}
       <span></span>
       {% endif %}
-      <span class="font-label-md text-on-surface-variant">Week {{ week_offset|add:'1' }}</span>
-      <a href="?week={{ week_offset|add:'1' }}&duration={{ duration }}"
-         class="flex items-center gap-1 text-primary font-label-md hover:underline">
+      <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--ink-soft);">Week {{ week_offset|add:'1' }}</span>
+      <a href="?week={{ week_offset|add:'1' }}&duration={{ duration }}" class="flex items-center gap-1 font-bold text-sm hover:underline" style="color: var(--forest);">
         Next Week<span class="material-symbols-outlined text-[18px]">chevron_right</span>
       </a>
     </div>
 
-    <!-- 7-day grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
       {% for day in week_days %}
-      <div class="day-card bg-white rounded-2xl overflow-hidden shadow-sm border transition-all
-                  {% if day.is_today %}today-card{% else %}border-outline-variant/20{% endif %}">
+      <div class="day-card bg-white rounded-2xl overflow-hidden shadow-sm border {% if day.is_today %}today-card{% else %}border-outline-variant/15{% endif %}">
 
-        <!-- Day Header -->
-        <div class="px-4 py-3 {% if day.is_today %}bg-primary text-on-primary{% else %}bg-surface-container{% endif %}">
-          <p class="font-label-md font-bold text-sm">{{ day.day_name }}</p>
+        <div class="px-4 py-3" style="{% if day.is_today %}background: var(--forest); color: white;{% else %}background: var(--parchment);{% endif %}">
+          <p class="font-bold text-sm">{{ day.day_name }}</p>
           <p class="text-[11px] opacity-80">{{ day.date }}</p>
           {% if day.is_today %}
           <span class="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">TODAY</span>
           {% endif %}
         </div>
 
-        <!-- Meals -->
         <div class="p-3 space-y-2">
 
           {% if day.breakfast %}
-          <div class="flex items-start gap-2 p-2 rounded-lg bg-surface-container-low">
-            <span class="material-symbols-outlined text-primary text-[16px] mt-0.5 shrink-0">wb_twilight</span>
-            <div class="min-w-0">
-              <p class="text-[11px] font-bold text-on-surface truncate">{{ day.breakfast.name }}</p>
-              <p class="text-[10px] text-on-surface-variant">{{ day.breakfast.calories_kcal }} kcal</p>
+          <div class="flex items-start justify-between gap-1 p-2 rounded-lg bg-surface-container-low">
+            <div class="flex items-start gap-2 min-w-0">
+              <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0" style="color: var(--forest);">wb_twilight</span>
+              <div class="min-w-0">
+                <p class="text-[11px] font-bold text-on-surface truncate">{{ day.breakfast.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ day.breakfast.calories_kcal }} kcal</p>
+              </div>
             </div>
+            {% if day.breakfast_score %}
+            <span class="text-[10px] font-bold shrink-0 mt-0.5" style="color: var(--pepper);">{% widthratio day.breakfast_score 1 100 %}%</span>
+            {% endif %}
           </div>
           {% else %}
           <div class="flex items-center gap-2 p-2 rounded-lg border border-dashed border-outline-variant/40">
@@ -135,12 +156,17 @@
           {% endif %}
 
           {% if day.lunch %}
-          <div class="flex items-start gap-2 p-2 rounded-lg bg-surface-container-low">
-            <span class="material-symbols-outlined text-secondary text-[16px] mt-0.5 shrink-0">light_mode</span>
-            <div class="min-w-0">
-              <p class="text-[11px] font-bold text-on-surface truncate">{{ day.lunch.name }}</p>
-              <p class="text-[10px] text-on-surface-variant">{{ day.lunch.calories_kcal }} kcal</p>
+          <div class="flex items-start justify-between gap-1 p-2 rounded-lg bg-surface-container-low">
+            <div class="flex items-start gap-2 min-w-0">
+              <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0" style="color: var(--gold);">light_mode</span>
+              <div class="min-w-0">
+                <p class="text-[11px] font-bold text-on-surface truncate">{{ day.lunch.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ day.lunch.calories_kcal }} kcal</p>
+              </div>
             </div>
+            {% if day.lunch_score %}
+            <span class="text-[10px] font-bold shrink-0 mt-0.5" style="color: var(--pepper);">{% widthratio day.lunch_score 1 100 %}%</span>
+            {% endif %}
           </div>
           {% else %}
           <div class="flex items-center gap-2 p-2 rounded-lg border border-dashed border-outline-variant/40">
@@ -150,12 +176,17 @@
           {% endif %}
 
           {% if day.dinner %}
-          <div class="flex items-start gap-2 p-2 rounded-lg bg-surface-container-low">
-            <span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5 shrink-0">dark_mode</span>
-            <div class="min-w-0">
-              <p class="text-[11px] font-bold text-on-surface truncate">{{ day.dinner.name }}</p>
-              <p class="text-[10px] text-on-surface-variant">{{ day.dinner.calories_kcal }} kcal</p>
+          <div class="flex items-start justify-between gap-1 p-2 rounded-lg bg-surface-container-low">
+            <div class="flex items-start gap-2 min-w-0">
+              <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0 text-on-surface-variant">dark_mode</span>
+              <div class="min-w-0">
+                <p class="text-[11px] font-bold text-on-surface truncate">{{ day.dinner.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ day.dinner.calories_kcal }} kcal</p>
+              </div>
             </div>
+            {% if day.dinner_score %}
+            <span class="text-[10px] font-bold shrink-0 mt-0.5" style="color: var(--pepper);">{% widthratio day.dinner_score 1 100 %}%</span>
+            {% endif %}
           </div>
           {% else %}
           <div class="flex items-center gap-2 p-2 rounded-lg border border-dashed border-outline-variant/40">
@@ -165,22 +196,26 @@
           {% endif %}
 
           {% if day.snack %}
-          <div class="flex items-start gap-2 p-2 rounded-lg bg-surface-container-low">
-            <span class="material-symbols-outlined text-tertiary text-[16px] mt-0.5 shrink-0">bakery_dining</span>
-            <div class="min-w-0">
-              <p class="text-[11px] font-bold text-on-surface truncate">{{ day.snack.name }}</p>
-              <p class="text-[10px] text-on-surface-variant">{{ day.snack.calories_kcal }} kcal</p>
+          <div class="flex items-start justify-between gap-1 p-2 rounded-lg bg-surface-container-low">
+            <div class="flex items-start gap-2 min-w-0">
+              <span class="material-symbols-outlined text-[16px] mt-0.5 shrink-0" style="color: var(--pepper);">bakery_dining</span>
+              <div class="min-w-0">
+                <p class="text-[11px] font-bold text-on-surface truncate">{{ day.snack.name }}</p>
+                <p class="text-[10px] text-on-surface-variant">{{ day.snack.calories_kcal }} kcal</p>
+              </div>
             </div>
+            {% if day.snack_score %}
+            <span class="text-[10px] font-bold shrink-0 mt-0.5" style="color: var(--pepper);">{% widthratio day.snack_score 1 100 %}%</span>
+            {% endif %}
           </div>
           {% endif %}
 
         </div>
 
-        <!-- Day Total -->
         <div class="px-3 pb-3">
           <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
             <span class="text-[10px] text-on-surface-variant">Total</span>
-            <span class="text-[11px] font-bold {% if day.is_today %}text-primary{% else %}text-on-surface{% endif %}">
+            <span class="text-[11px] font-bold" style="{% if day.is_today %}color: var(--forest);{% else %}color: var(--ink);{% endif %}">
               {{ day.total_kcal }} kcal
             </span>
           </div>
@@ -191,57 +226,56 @@
       <div class="col-span-7 text-center py-16">
         <span class="material-symbols-outlined text-5xl text-outline">calendar_today</span>
         <p class="text-on-surface-variant mt-4">No plan generated yet.</p>
-        <a href="{% url 'meal_plan' %}" class="mt-4 inline-block px-6 py-3 bg-primary text-on-primary rounded-xl font-label-md">Generate Plan</a>
+        <a href="{% url 'meal_plan' %}" class="mt-4 inline-block px-6 py-3 text-white rounded-xl font-bold text-sm" style="background: var(--forest);">Generate Plan</a>
       </div>
       {% endfor %}
     </div>
 
   </section>
 
-  <footer class="w-full px-margin-mobile md:px-margin-desktop mt-16 border-t border-outline-variant bg-surface-container-highest">
-    <div class="max-w-container-max mx-auto py-stack-lg flex justify-between items-center">
-      <span class="font-headline-md text-headline-md text-primary font-bold">MyNaijaDiet</span>
-      <p class="font-caption text-caption text-on-surface-variant">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
+  <footer class="w-full px-4 md:px-8 mt-16 border-t border-outline-variant/20 bg-white">
+    <div class="max-w-6xl mx-auto py-6 flex justify-between items-center">
+      <span class="font-display font-semibold text-lg" style="color: var(--forest);">MyNaijaDiet</span>
+      <p class="text-xs text-on-surface-variant">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
     </div>
   </footer>
 </main>
 
 <!-- Sticky Summary Bar -->
-<div class="fixed bottom-0 left-0 w-full lg:left-64 lg:w-[calc(100%-16rem)] bg-white/90 backdrop-blur-md border-t border-outline-variant z-40 px-margin-mobile md:px-margin-desktop py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-  <div class="max-w-container-max mx-auto flex flex-col md:flex-row items-center gap-4">
+<div class="fixed bottom-0 left-0 w-full lg:left-64 lg:w-[calc(100%-16rem)] bg-white/90 backdrop-blur-md border-t border-outline-variant/20 z-40 px-4 md:px-8 py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] font-body">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-4">
     <div class="flex-1 w-full">
       <div class="flex justify-between mb-2">
-        <span class="font-label-md text-on-surface">Today's Progress</span>
-        <span class="font-label-md text-primary font-bold">{{ consumed_kcal }} / {{ calorie_target }} kcal</span>
+        <span class="text-sm font-bold text-on-surface">Today's Progress</span>
+        <span class="text-sm font-bold" style="color: var(--forest);">{{ consumed_kcal }} / {{ calorie_target }} kcal</span>
       </div>
       <div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
-        <div class="h-full bg-primary rounded-full progress-glow transition-all duration-1000"
-             style="width: {{ progress_pct }}%;"></div>
+        <div class="h-full rounded-full progress-glow transition-all duration-1000" style="width: {{ progress_pct }}%; background: var(--forest);"></div>
       </div>
     </div>
-    <div class="flex gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-outline-variant pt-3 md:pt-0">
+    <div class="flex gap-6 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 border-outline-variant/20 pt-3 md:pt-0">
       <div class="text-center">
-        <p class="font-caption text-caption text-on-surface-variant">Protein</p>
-        <p class="font-label-md text-on-surface">{{ consumed_protein }}g / {{ target_protein }}g</p>
+        <p class="text-[11px] text-on-surface-variant">Protein</p>
+        <p class="text-sm font-bold text-on-surface">{{ consumed_protein }}g / {{ target_protein }}g</p>
       </div>
       <div class="text-center">
-        <p class="font-caption text-caption text-on-surface-variant">Carbs</p>
-        <p class="font-label-md text-on-surface">{{ consumed_carbs }}g / {{ target_carbs }}g</p>
+        <p class="text-[11px] text-on-surface-variant">Carbs</p>
+        <p class="text-sm font-bold text-on-surface">{{ consumed_carbs }}g / {{ target_carbs }}g</p>
       </div>
       <div class="text-center">
-        <p class="font-caption text-caption text-on-surface-variant">Fats</p>
-        <p class="font-label-md text-on-surface">{{ consumed_fats }}g / {{ target_fats }}g</p>
+        <p class="text-[11px] text-on-surface-variant">Fats</p>
+        <p class="text-sm font-bold text-on-surface">{{ consumed_fats }}g / {{ target_fats }}g</p>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Bottom Nav Mobile -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 lg:hidden bg-surface shadow-lg rounded-t-xl" style="bottom: 76px;">
-  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'dashboard' %}"><span class="material-symbols-outlined">dashboard</span><span class="text-caption">Dashboard</span></a>
-  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'recommendations' %}"><span class="material-symbols-outlined">recommend</span><span class="text-caption">Recs</span></a>
-  <a class="flex flex-col items-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="{% url 'meal_plan' %}"><span class="material-symbols-outlined">restaurant_menu</span><span class="text-caption">Plan</span></a>
-  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'profile' %}"><span class="material-symbols-outlined">person</span><span class="text-caption">Profile</span></a>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 lg:hidden bg-white shadow-lg rounded-t-xl font-body" style="bottom: 76px;">
+  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'dashboard' %}"><span class="material-symbols-outlined">dashboard</span><span class="text-[10px]">Dashboard</span></a>
+  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'recommendations' %}"><span class="material-symbols-outlined">recommend</span><span class="text-[10px]">Recs</span></a>
+  <a class="flex flex-col items-center rounded-full px-4 py-1" style="background: var(--forest-soft); color: var(--forest);" href="{% url 'meal_plan' %}"><span class="material-symbols-outlined">restaurant_menu</span><span class="text-[10px]">Plan</span></a>
+  <a class="flex flex-col items-center text-on-surface-variant" href="{% url 'profile' %}"><span class="material-symbols-outlined">person</span><span class="text-[10px]">Profile</span></a>
 </nav>
 
-{% endblock %}
+{% endblock %} 

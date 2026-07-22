@@ -1,0 +1,1 @@
+from recommender.commands.auto_download_images import Command

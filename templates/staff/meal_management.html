@@ -1,0 +1,85 @@
+{% extends "staff/admin_base.html" %}
+{% block title %}Meal Management | MyNaijaDiet Admin{% endblock %}
+
+{% block content %}
+<div class="px-4 md:px-8 py-8 max-w-6xl mx-auto">
+
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-display font-semibold text-3xl" style="color: var(--ink);">Meal Management</h1>
+      <p class="text-sm mt-1" style="color: var(--ink-soft);">
+        {{ meals|length }} meal{{ meals|length|pluralize }}
+        {% if not request.user.is_superuser %}· edits require super admin approval{% endif %}
+      </p>
+    </div>
+    <a href="{% url 'propose_new_meal' %}" class="px-5 py-2.5 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-all shrink-0" style="background: var(--forest);">
+      + Add New Meal
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 px-4 py-3 rounded-xl text-sm font-semibold" style="background: var(--forest-soft); color: var(--forest);">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="get" class="mb-6">
+    <div class="relative max-w-md">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px]">search</span>
+      <input type="text" name="search" value="{{ search }}" placeholder="Search meals..."
+             class="w-full pl-10 pr-4 py-2.5 rounded-xl border-[1.5px] text-sm"
+             style="border-color: rgba(0,0,0,0.12);">
+    </div>
+  </form>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for meal in meals %}
+    <div class="bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
+      <div class="relative h-36 flex items-center justify-center" style="background: var(--forest-soft);">
+        {% if meal.image %}
+        <img src="{{ meal.image.url }}" alt="{{ meal.food_name }}" class="w-full h-full object-cover">
+        {% else %}
+        <span class="material-symbols-outlined text-5xl" style="color: rgba(15,61,19,0.2);">restaurant</span>
+        {% endif %}
+        <span class="absolute top-2 right-2 text-[10px] font-bold uppercase px-2 py-1 rounded-full bg-white/90" style="color: var(--forest);">
+          {{ meal.category }}
+        </span>
+      </div>
+
+      <div class="p-4">
+        <p class="font-bold text-sm truncate" style="color: var(--ink);">{{ meal.food_name }}</p>
+        <p class="text-xs mt-0.5" style="color: var(--ink-soft);">{{ meal.calories_kcal }} kcal · {{ meal.region }}</p>
+
+        <div class="flex gap-2 mt-3">
+          {% if request.user.is_superuser %}
+          <a href="{% url 'superuser_edit_meal' meal.id %}" class="flex-1 text-center py-2 rounded-lg text-xs font-bold transition-colors" style="background: var(--forest-soft); color: var(--forest);">
+            Edit
+          </a>
+          <form method="post" action="{% url 'superuser_delete_meal' meal.id %}" class="flex-1"
+                onsubmit="return confirm('Permanently delete {{ meal.food_name }}? This cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit" class="w-full py-2 rounded-lg text-xs font-bold" style="background: #FEE2E2; color: #991B1B;">
+              Delete
+            </button>
+          </form>
+          {% else %}
+          <a href="{% url 'propose_meal_update' meal.id %}" class="flex-1 text-center py-2 rounded-lg text-xs font-bold transition-colors" style="background: var(--forest-soft); color: var(--forest);">
+            Suggest Edit
+          </a>
+          <a href="{% url 'propose_meal_delete' meal.id %}" class="flex-1 text-center py-2 rounded-lg text-xs font-bold" style="background: #FEE2E2; color: #991B1B;">
+            Suggest Delete
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center py-16">
+      <span class="material-symbols-outlined text-5xl text-outline">search_off</span>
+      <p class="mt-3 text-sm" style="color: var(--ink-soft);">No meals found.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ meal.name }} | MyNaijaDiet{% endblock %}
+{% block title %}{{ meal.food_name }} | MyNaijaDiet{% endblock %}
 
 {% block body %}
 <aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant bg-surface-container-low fixed left-0 top-0 w-64 z-50">
@@ -35,13 +35,13 @@
 
   <!-- Hero Section -->
   <section class="relative w-full h-[320px] md:h-[420px] overflow-hidden bg-surface-container flex items-center justify-center">
-    <span class="material-symbols-outlined text-9xl text-outline">restaurant</span>
+    <img src="{{ meal.get_display_image }}" alt="{{ meal.food_name }}" class="w-full h-full object-cover">
     <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-margin-mobile md:p-margin-desktop">
       <div class="text-white">
         <span class="inline-block px-3 py-1 bg-primary text-on-primary rounded-full font-label-md text-label-md mb-2 uppercase tracking-wider">
           {{ meal.diet_type|title }}
         </span>
-        <h3 class="font-headline-lg text-3xl font-bold">{{ meal.name }}</h3>
+        <h3 class="font-headline-lg text-3xl font-bold">{{ meal.food_name }}</h3>
         <p class="font-body-md opacity-90 italic mt-1">{{ meal.region }}</p>
       </div>
     </div>
@@ -116,6 +116,18 @@
         </div>
       </div>
 
+      <!-- Community Rating -->
+      {% if avg_rating %}
+      <div class="p-6 bg-surface-container-low rounded-2xl border border-outline-variant">
+        <h4 class="font-label-md text-label-md text-primary mb-4 uppercase tracking-tighter">Community Rating</h4>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-2xl">star</span>
+          <span class="font-headline-md text-xl font-bold">{{ avg_rating|floatformat:1 }}</span>
+          <span class="font-caption text-on-surface-variant">({{ feedback_count }} rating{{ feedback_count|pluralize }})</span>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
 
     <!-- Main Content -->
@@ -138,7 +150,7 @@
           <div class="bg-surface-container-high p-4 rounded-2xl flex flex-col justify-center">
             <span class="font-label-md text-on-surface-variant uppercase text-[10px] mb-1">Protein</span>
             <div class="flex items-baseline gap-1">
-              <span class="font-headline-md text-on-surface font-bold">{{ meal.protein }}</span>
+              <span class="font-headline-md text-on-surface font-bold">{{ meal.protein_g }}</span>
               <span class="font-caption text-on-surface-variant">g</span>
             </div>
           </div>
@@ -146,7 +158,7 @@
           <div class="bg-surface-container-high p-4 rounded-2xl flex flex-col justify-center">
             <span class="font-label-md text-on-surface-variant uppercase text-[10px] mb-1">Carbs</span>
             <div class="flex items-baseline gap-1">
-              <span class="font-headline-md text-on-surface font-bold">{{ meal.carbs }}</span>
+              <span class="font-headline-md text-on-surface font-bold">{{ meal.carb_g }}</span>
               <span class="font-caption text-on-surface-variant">g</span>
             </div>
           </div>
@@ -154,7 +166,7 @@
           <div class="bg-surface-container-high p-4 rounded-2xl flex flex-col justify-center">
             <span class="font-label-md text-on-surface-variant uppercase text-[10px] mb-1">Fats</span>
             <div class="flex items-baseline gap-1">
-              <span class="font-headline-md text-on-surface font-bold">{{ meal.fat }}</span>
+              <span class="font-headline-md text-on-surface font-bold">{{ meal.fat_g }}</span>
               <span class="font-caption text-on-surface-variant">g</span>
             </div>
           </div>
@@ -170,13 +182,12 @@
       <!-- Macro Visual Bars -->
       <section class="bg-white p-6 rounded-2xl border border-outline-variant/20 shadow-sm">
         <h4 class="font-headline-md text-on-surface mb-4">Macro Distribution</h4>
-        {% with total=meal.protein|add:meal.carbs|add:meal.fat %}
         <div class="space-y-4">
 
           <div>
             <div class="flex justify-between mb-1">
               <span class="text-body-md">Protein</span>
-              <span class="font-bold text-primary">{{ meal.protein }}g</span>
+              <span class="font-bold text-primary">{{ meal.protein_g }}g</span>
             </div>
             <div class="w-full bg-surface-container h-3 rounded-full">
               <div class="bg-primary h-full rounded-full" style="width: {{ protein_pct }}%"></div>
@@ -186,7 +197,7 @@
           <div>
             <div class="flex justify-between mb-1">
               <span class="text-body-md">Carbohydrates</span>
-              <span class="font-bold text-secondary">{{ meal.carbs }}g</span>
+              <span class="font-bold text-secondary">{{ meal.carb_g }}g</span>
             </div>
             <div class="w-full bg-surface-container h-3 rounded-full">
               <div class="bg-secondary-container h-full rounded-full" style="width: {{ carb_pct }}%"></div>
@@ -196,7 +207,7 @@
           <div>
             <div class="flex justify-between mb-1">
               <span class="text-body-md">Fats</span>
-              <span class="font-bold text-on-surface-variant">{{ meal.fat }}g</span>
+              <span class="font-bold text-on-surface-variant">{{ meal.fat_g }}g</span>
             </div>
             <div class="w-full bg-surface-container h-3 rounded-full">
               <div class="bg-secondary-fixed-dim h-full rounded-full" style="width: {{ fat_pct }}%"></div>
@@ -204,7 +215,6 @@
           </div>
 
         </div>
-        {% endwith %}
         <p class="text-caption text-on-surface-variant mt-4">
           Taste profile: <strong>{{ meal.taste_profile|title }}</strong>
         </p>
@@ -272,7 +282,7 @@
           <div>
             <h5 class="font-label-md text-primary mb-1">AI Preparation Guide</h5>
             <p class="font-body-md text-on-surface-variant">
-              Step-by-step preparation instructions for <strong>{{ meal.name }}</strong> will be generated
+              Step-by-step preparation instructions for <strong>{{ meal.food_name }}</strong> will be generated
               by the AI engine in the next phase of development.
             </p>
           </div>
@@ -288,6 +298,56 @@
         </div>
       </div>
 
+      <!-- Feedback -->
+      <section class="bg-white p-6 rounded-2xl border border-outline-variant/20 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-headline-md text-on-surface">Rate This Meal</h4>
+          {% if avg_rating %}
+          <span class="flex items-center gap-1 text-on-surface-variant font-label-md">
+            <span class="material-symbols-outlined text-[18px] text-primary">star</span>
+            {{ avg_rating|floatformat:1 }} · {{ feedback_count }} rating{{ feedback_count|pluralize }}
+          </span>
+          {% endif %}
+        </div>
+
+        <form method="post" action="{% url 'submit_meal_feedback' meal.id %}" class="space-y-4">
+          {% csrf_token %}
+
+          <div>
+            <p class="font-label-md text-on-surface-variant mb-2">Your Rating</p>
+            <div class="flex flex-row-reverse justify-end gap-1" id="star-picker">
+              {% for i in "54321" %}
+              <label class="cursor-pointer star-label" data-value="{{ i }}">
+                <input type="radio" name="rating" value="{{ i }}" class="hidden"
+                       {% if existing_feedback.rating|stringformat:"s" == i %}checked{% endif %} required>
+                <span class="material-symbols-outlined text-3xl text-outline star-icon transition-colors">
+                  star
+                </span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 cursor-pointer w-fit">
+            <input type="checkbox" name="was_cooked" class="w-4 h-4 accent-primary"
+                   {% if existing_feedback.was_cooked %}checked{% endif %}>
+            <span class="font-body-md text-on-surface-variant">I cooked this at home</span>
+          </label>
+
+          <div>
+            <label class="font-label-md text-on-surface-variant mb-1 block">Comment (optional)</label>
+            <textarea name="comment" rows="3"
+                      class="w-full rounded-xl border border-outline-variant p-3 font-body-md focus:outline-none focus:border-primary"
+                      placeholder="What did you think?">{{ existing_feedback.comment|default:"" }}</textarea>
+          </div>
+
+          <button type="submit"
+                  class="bg-primary text-on-primary font-label-md px-6 py-3 rounded-xl shadow-md active:scale-95 transition-all">
+            {% if existing_feedback %}Update Feedback{% else %}Submit Feedback{% endif %}
+          </button>
+        </form>
+      </section>
+
       <!-- Similar Meals -->
       {% if similar_meals %}
       <section>
@@ -295,11 +355,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {% for similar in similar_meals %}
           <a href="{% url 'meal_detail' similar.id %}" class="bg-white p-4 rounded-xl border border-outline-variant/30 shadow-sm hover:shadow-md transition-all flex gap-3 items-center">
-            <div class="w-12 h-12 bg-surface-container rounded-lg flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-outline">restaurant</span>
+            <div class="w-12 h-12 bg-surface-container rounded-lg overflow-hidden shrink-0">
+              <img src="{{ similar.get_display_image }}" alt="{{ similar.food_name }}" class="w-full h-full object-cover">
             </div>
             <div>
-              <p class="font-label-md text-on-surface">{{ similar.name }}</p>
+              <p class="font-label-md text-on-surface">{{ similar.food_name }}</p>
               <p class="text-caption text-on-surface-variant">{{ similar.calories }} kcal · {{ similar.diet_type }}</p>
             </div>
           </a>
@@ -353,4 +413,47 @@ function switchTab(tab) {
         infoPanel.classList.add('hidden');
     }
 }
+
+// Star rating picker — fills all stars up to and including the hovered/selected one.
+// Markup renders stars 5→1 in DOM order, then uses flex-row-reverse so they *display* 1→5,
+// letting the ~ sibling trick fill "up to" the selected star with plain CSS-in-JS toggling.
+(function () {
+    const picker = document.getElementById('star-picker');
+    if (!picker) return;
+
+    const labels = Array.from(picker.querySelectorAll('.star-label'));
+
+    function paint(selectedValue) {
+        labels.forEach(label => {
+            const icon = label.querySelector('.star-icon');
+            const value = parseInt(label.dataset.value, 10);
+            if (value <= selectedValue) {
+                icon.classList.add('text-primary');
+                icon.classList.remove('text-outline');
+            } else {
+                icon.classList.remove('text-primary');
+                icon.classList.add('text-outline');
+            }
+        });
+    }
+
+    function currentChecked() {
+        const checked = picker.querySelector('input[type=radio]:checked');
+        return checked ? parseInt(checked.value, 10) : 0;
+    }
+
+    // Initial paint (e.g. existing feedback)
+    paint(currentChecked());
+
+    labels.forEach(label => {
+        const value = parseInt(label.dataset.value, 10);
+        label.addEventListener('mouseenter', () => paint(value));
+        label.addEventListener('click', () => {
+            label.querySelector('input[type=radio]').checked = true;
+            paint(value);
+        });
+    });
+
+    picker.addEventListener('mouseleave', () => paint(currentChecked()));
+})();
 {% endblock %}

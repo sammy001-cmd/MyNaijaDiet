@@ -1,0 +1,120 @@
+{% extends "staff/admin_base.html" %}
+{% block title %}{% if mode == 'update' %}Edit{% else %}New{% endif %} Meal Proposal | MyNaijaDiet Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+  .form-input, select.form-input, textarea.form-input {
+    width: 100%; padding: 0.65rem 0.9rem; border-radius: 0.75rem;
+    border: 1.5px solid rgba(0,0,0,0.12); font-family: 'Inter', sans-serif;
+    font-size: 0.875rem; background: white;
+  }
+  .form-input:focus { outline: none; border-color: var(--forest); }
+  .field-label { font-size: 0.75rem; font-weight: 700; color: var(--ink-soft); margin-bottom: 0.35rem; display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 md:px-8 py-10">
+
+  <div class="mb-8">
+    <a href="{% url 'meal_edit_queue' %}" class="text-sm font-bold hover:underline" style="color: var(--forest);">&larr; Back to My Proposals</a>
+    <h1 class="font-display font-semibold text-3xl mt-2" style="color: var(--ink);">
+      {% if mode == 'update' %}{% if instant %}Edit{% else %}Propose Edit{% endif %} — {{ meal.food_name }}{% else %}{% if instant %}Add New Meal{% else %}Propose New Meal{% endif %}{% endif %}
+    </h1>
+    <p class="text-sm mt-1" style="color: var(--ink-soft);">
+      {% if instant %}This will update the live dataset immediately.{% else %}This won't go live until the super admin approves it.{% endif %}
+    </p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="bg-white rounded-2xl border border-outline-variant/10 shadow-sm p-6 space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="field-label">Meal Photo</label>
+      {% if meal.image %}
+      <img src="{{ meal.image.url }}" alt="{{ meal.food_name }}" class="w-32 h-24 object-cover rounded-lg mb-2">
+      {% endif %}
+      {{ form.image }}
+      <p class="text-xs mt-1" style="color: var(--ink-soft);">{{ form.image.help_text }}</p>
+    </div>
+
+    <div>
+      <label class="field-label">Food Name</label>
+      {{ form.food_name }}
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="field-label">Category</label>
+        {{ form.category }}
+      </div>
+      <div>
+        <label class="field-label">Region</label>
+        {{ form.region }}
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">Meal Time</label>
+      {{ form.meal_time }}
+      <p class="text-xs mt-1" style="color: var(--ink-soft);">{{ form.meal_time.help_text }}</p>
+    </div>
+
+    <div class="grid grid-cols-4 gap-4">
+      <div>
+        <label class="field-label">Calories</label>
+        {{ form.calories_kcal }}
+      </div>
+      <div>
+        <label class="field-label">Protein (g)</label>
+        {{ form.protein_g }}
+      </div>
+      <div>
+        <label class="field-label">Carbs (g)</label>
+        {{ form.carb_g }}
+      </div>
+      <div>
+        <label class="field-label">Fat (g)</label>
+        {{ form.fat_g }}
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="field-label">Goal Suitability</label>
+        {{ form.goal_suitability }}
+      </div>
+      <div>
+        <label class="field-label">Diet Type</label>
+        {{ form.diet_type }}
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">Taste Profile</label>
+      {{ form.taste_profile }}
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="field-label">Prep Time</label>
+        {{ form.prep_time }}
+      </div>
+      <div>
+        <label class="field-label">Price Range</label>
+        {{ form.price_range }}
+      </div>
+    </div>
+
+    <div class="pt-4 flex gap-3">
+      <button type="submit" class="px-6 py-3 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-all" style="background: var(--forest);">
+        {% if instant %}Save Changes{% else %}Submit for Review{% endif %}
+      </button>
+      <a href="{% if instant %}{% url 'meal_management' %}{% else %}{% url 'meal_edit_queue' %}{% endif %}" class="px-6 py-3 rounded-xl text-sm font-bold border transition-all" style="border-color: rgba(0,0,0,0.15); color: var(--ink-soft);">
+        Cancel
+      </a>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

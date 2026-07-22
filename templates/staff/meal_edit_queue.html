@@ -1,0 +1,50 @@
+{% extends "staff/admin_base.html" %}
+{% block title %}My Proposals | MyNaijaDiet Admin{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 md:px-8 py-10">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-display font-semibold text-3xl" style="color: var(--ink);">My Proposals</h1>
+      <p class="text-sm mt-1" style="color: var(--ink-soft);">Changes you've submitted for review.</p>
+    </div>
+    <a href="{% url 'propose_new_meal' %}" class="px-5 py-2.5 text-white rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-all" style="background: var(--forest);">
+      + Propose New Meal
+    </a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 px-4 py-3 rounded-xl text-sm font-semibold" style="background: var(--forest-soft); color: var(--forest);">
+      {{ message }}
+    </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
+    {% for edit in my_edits %}
+    <div class="flex items-center justify-between px-6 py-4 {% if not forloop.last %}border-b border-outline-variant/10{% endif %}">
+      <div>
+        <p class="font-bold text-sm" style="color: var(--ink);">
+          {{ edit.get_action_display }} — {% if edit.target_meal %}{{ edit.target_meal.food_name }}{% else %}{{ edit.payload.food_name|default:"New Meal" }}{% endif %}
+        </p>
+        <p class="text-xs mt-0.5" style="color: var(--ink-soft);">Submitted {{ edit.created_at|timesince }} ago</p>
+        {% if edit.status == 'rejected' and edit.reviewer_notes %}
+        <p class="text-xs mt-1 italic" style="color: #991B1B;">Note: {{ edit.reviewer_notes }}</p>
+        {% endif %}
+      </div>
+      <span class="status-{{ edit.status }} text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+        {{ edit.get_status_display }}
+      </span>
+    </div>
+    {% empty %}
+    <div class="text-center py-16">
+      <span class="material-symbols-outlined text-5xl text-outline">inbox</span>
+      <p class="mt-3 text-sm" style="color: var(--ink-soft);">No proposals yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 
 # ============================================================
@@ -78,7 +79,7 @@ class HealthProfile(models.Model):
 
     GOAL_CHOICES = [
         ("weight_loss",   "Lose Weight"),
-        ("muscle_gain",   "Gain Muscle"),
+        ("weight_gain",   "Gain Weight"),
         ("maintenance",   "Maintain Weight"),
     ]
 
@@ -174,7 +175,7 @@ class HealthProfile(models.Model):
         """
         if self.health_goal == "weight_loss":
             return round(self.tdee - 500, 0)
-        elif self.health_goal == "muscle_gain":
+        elif self.health_goal == "weight_gain":
             return round(self.tdee + 300, 0)
         return round(self.tdee, 0)
 
@@ -205,7 +206,7 @@ class Meal(models.Model):
 
     GOAL_CHOICES = [
         ("weight_loss",  "Weight Loss"),
-        ("muscle_gain",  "Muscle Gain"),
+        ("weight_gain",  "Weight Gain"),
         ("maintenance",  "Maintenance"),
         ("all",          "All Goals"),
     ]
@@ -250,6 +251,7 @@ class Meal(models.Model):
     price_range      = models.CharField(max_length=10, choices=PRICE_CHOICES)
 
     # Metadata
+    image            = models.ImageField(upload_to="meal_images/", blank=True, null=True)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
 
@@ -282,6 +284,12 @@ class Meal(models.Model):
     @property
     def meal_type(self):
         return self.category.upper()
+
+    @property
+    def get_display_image(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return ''
 
     def __str__(self):
         return f"{self.food_name} ({self.calories_kcal} kcal)"
@@ -348,6 +356,7 @@ class MealPlanEntry(models.Model):
     meal_time       = models.CharField(max_length=20, choices=MEAL_TIME_CHOICES)
     portion_size    = models.FloatField(default=1.0, help_text="1.0 = standard serving")
     actual_calories = models.PositiveIntegerField(blank=True, null=True)
+    match_score     = models.FloatField(default=0.5, help_text="LightGBM prediction score at time of planning, 0-1")
 
     class Meta:
         verbose_name        = "Meal Plan Entry"
@@ -425,3 +434,106 @@ class MealFeedback(models.Model):
 
     def __str__(self):
         return f"{self.user.get_full_name()} rated {self.meal.food_name} — {self.rating}/5"
+    
+
+
+
+class MealEdit(models.Model):
+    """
+    A staff-proposed change to the Meal dataset. Nothing here touches
+    the live Meal table until a superadmin approves it.
+    """
+
+    ACTION_CHOICES = [
+        ('create', 'Add New Meal'),
+        ('update', 'Edit Existing Meal'),
+        ('delete', 'Delete Meal'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
+    target_meal = models.ForeignKey(
+        'Meal',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pending_edits',
+        help_text="The meal being edited/deleted. Blank for new meal proposals."
+    )
+    payload = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Proposed field values, e.g. {'food_name': 'Jollof Rice', 'calories_kcal': 620, ...}"
+    )
+    image = models.ImageField(
+        upload_to='meal_edit_uploads/',
+        blank=True,
+        null=True,
+        help_text="Proposed image, applied to the meal on approval."
+    )
+
+    submitted_by = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE,
+        related_name='submitted_edits'
+    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    reviewed_by = models.ForeignKey(
+        'User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviewed_edits'
+    )
+    reviewer_notes = models.TextField(blank=True, null=True)
+    reviewed_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Meal Edit Proposal"
+        verbose_name_plural = "Meal Edit Proposals"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        target = self.target_meal.food_name if self.target_meal else self.payload.get('food_name', 'New Meal')
+        return f"[{self.get_status_display()}] {self.get_action_display()} — {target}"
+
+    def apply(self, reviewer):
+        """
+        Applies the proposed change to the live Meal table.
+        Called only when a superadmin approves.
+        """
+        from .models import Meal  # local import avoids circular import at module load
+
+        if self.action == 'create':
+            meal = Meal.objects.create(**self.payload)
+            if self.image:
+                meal.image = self.image
+                meal.save()
+
+        elif self.action == 'update' and self.target_meal:
+            for field, value in self.payload.items():
+                setattr(self.target_meal, field, value)
+            if self.image:
+                self.target_meal.image = self.image
+            self.target_meal.save()
+
+        elif self.action == 'delete' and self.target_meal:
+            self.target_meal.delete()
+
+        self.status = 'approved'
+        self.reviewed_by = reviewer
+        self.reviewed_at = timezone.now()
+        self.save()
+
+    def reject(self, reviewer, notes=''):
+        self.status = 'rejected'
+        self.reviewed_by = reviewer
+        self.reviewer_notes = notes
+        self.reviewed_at = timezone.now()
+        self.save()

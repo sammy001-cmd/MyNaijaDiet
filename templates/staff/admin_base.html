@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin | MyNaijaDiet{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --forest: #0F3D13; --forest-soft: #E8F0E6; --gold: #F9A825;
+      --pepper: #C1440E; --pepper-soft: #FBEAE0; --parchment: #FBF8F2;
+      --ink: #1C1C1A; --ink-soft: #6B6560;
+    }
+    body { background: var(--parchment); font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Fraunces', serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .nav-active { background: var(--forest-soft); color: var(--forest); font-weight: 700; }
+    .status-pending  { background: #FEF3C7; color: #92400E; }
+    .status-approved { background: var(--forest-soft); color: var(--forest); }
+    .status-rejected { background: #FEE2E2; color: #991B1B; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="hidden lg:flex flex-col h-screen px-4 py-6 border-r border-outline-variant/20 bg-white fixed left-0 top-0 w-64 z-40">
+  <div class="mb-8 px-2">
+    <div class="flex items-center gap-2 mb-1">
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center shadow-sm" style="background: var(--forest);">
+        <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">eco</span>
+      </div>
+      <h1 class="font-display font-semibold text-lg tracking-tight" style="color: var(--forest);">MyNaijaDiet</h1>
+    </div>
+    <p class="text-xs text-on-surface-variant px-10">Admin Dashboard</p>
+  </div>
+
+  <nav class="flex-1 space-y-1 text-sm">
+    <p class="text-[10px] font-bold uppercase tracking-wider px-4 mb-2" style="color: var(--ink-soft);">Overview</p>
+    <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 {% if active == 'dashboard' %}nav-active{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+      <span class="material-symbols-outlined text-[20px]">space_dashboard</span>Dashboard
+    </a>
+
+    <p class="text-[10px] font-bold uppercase tracking-wider px-4 mb-2 mt-5" style="color: var(--ink-soft);">Meal Data</p>
+    <a href="{% url 'meal_management' %}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 {% if active == 'meals' %}nav-active{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+      <span class="material-symbols-outlined text-[20px]">restaurant_menu</span>Meal Management
+    </a>
+    <a href="{% url 'meal_edit_queue' %}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 {% if active == 'queue' %}nav-active{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+      <span class="material-symbols-outlined text-[20px]">edit_note</span>My Proposals
+    </a>
+    {% if request.user.is_superuser %}
+    <a href="{% url 'review_queue' %}" class="flex items-center gap-3 rounded-xl px-4 py-2.5 {% if active == 'review' %}nav-active{% else %}text-on-surface-variant hover:bg-surface-container-low{% endif %}">
+      <span class="material-symbols-outlined text-[20px]">fact_check</span>Review Queue
+      {% if pending_count %}<span class="ml-auto text-[10px] font-bold text-white rounded-full px-2 py-0.5" style="background: var(--pepper);">{{ pending_count }}</span>{% endif %}
+    </a>
+    {% endif %}
+
+    {% if request.user.is_superuser %}
+    <p class="text-[10px] font-bold uppercase tracking-wider px-4 mb-2 mt-5" style="color: var(--ink-soft);">System</p>
+    <a href="/admin/recommender/user/" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low">
+      <span class="material-symbols-outlined text-[20px]">group</span>Users
+    </a>
+    <a href="/admin/recommender/mealfeedback/" class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low">
+      <span class="material-symbols-outlined text-[20px]">star</span>Feedback
+    </a>
+    {% endif %}
+  </nav>
+
+  <div class="border-t border-outline-variant/20 pt-4 mt-4">
+    <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-2 py-2 text-xs font-bold hover:opacity-80 transition-opacity" style="color: var(--ink-soft);">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span>Back to App
+    </a>
+    <div class="flex items-center gap-3 px-2 mt-2">
+      <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style="background: var(--forest-soft);">
+        <span class="font-bold text-xs" style="color: var(--forest);">{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</span>
+      </div>
+      <div class="overflow-hidden">
+        <p class="text-xs font-bold text-on-surface truncate">{{ request.user.get_full_name }}</p>
+        <p class="text-[10px] text-on-surface-variant">{% if request.user.is_superuser %}Super Admin{% else %}Staff Editor{% endif %}</p>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile header -->
+<header class="lg:hidden flex justify-between items-center w-full px-4 py-3 sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-outline-variant/20">
+  <span class="font-display font-semibold text-lg" style="color: var(--forest);">MyNaijaDiet Admin</span>
+  <a href="{% url 'dashboard' %}" class="text-xs font-bold" style="color: var(--forest);">Back to App</a>
+</header>
+
+<main class="lg:ml-64 min-h-screen">
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

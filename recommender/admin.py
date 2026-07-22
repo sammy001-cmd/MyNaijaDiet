@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import (
     User,
@@ -26,7 +27,8 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ("email", "first_name", "last_name")
     ordering      = ("-date_joined",)
 
-    # Override fieldsets to use email instead of username
+    readonly_fields = ("date_joined",)
+
     fieldsets = (
         (None,               {"fields": ("email", "password")}),
         ("Personal Info",    {"fields": ("first_name", "last_name")}),
@@ -67,7 +69,8 @@ class HealthProfileAdmin(admin.ModelAdmin):
 
 
 # ============================================================
-# MEAL ADMIN
+# MEAL ADMIN — direct edits locked to superuser only.
+# Staff propose changes through MealEdit below instead.
 # ============================================================
 
 @admin.register(Meal)
@@ -91,19 +94,24 @@ class MealAdmin(admin.ModelAdmin):
         ("Details",      {"fields": ("taste_profile", "prep_time", "price_range")}),
     )
 
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
 
 # ============================================================
 # MEAL PLAN ADMIN
 # ============================================================
 
 class MealPlanEntryInline(admin.TabularInline):
-    """
-    Shows all entries (meals) inside a MealPlan directly on
-    the MealPlan detail page — no need to navigate separately.
-    """
     model  = MealPlanEntry
     extra  = 0
-    fields = ("day", "meal_time", "meal", "portion_size", "actual_calories")
+    fields = ("day", "meal_time", "meal", "portion_size", "actual_calories", "match_score")
     readonly_fields = ("actual_calories",)
 
 
@@ -123,13 +131,9 @@ class MealPlanAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
 
 
-# ============================================================
-# MEAL PLAN ENTRY ADMIN (standalone view)
-# ============================================================
-
 @admin.register(MealPlanEntry)
 class MealPlanEntryAdmin(admin.ModelAdmin):
-    list_display  = ("meal_plan", "day", "meal_time", "meal", "portion_size", "actual_calories")
+    list_display  = ("meal_plan", "day", "meal_time", "meal", "portion_size", "actual_calories", "match_score")
     list_filter   = ("day", "meal_time")
     search_fields = ("meal_plan__plan_name", "meal__food_name")
     ordering      = ("meal_plan", "day", "meal_time")
@@ -176,3 +180,11 @@ class MealFeedbackAdmin(admin.ModelAdmin):
         ("Comment",      {"fields": ("comment",)}),
         ("Timestamps",   {"fields": ("created_at",)}),
     )
+
+
+# ============================================================
+# ADMIN SITE BRANDING
+# ============================================================
+admin.site.site_header  = "MyNaijaDiet Administration"
+admin.site.site_title   = "MyNaijaDiet Admin"
+admin.site.index_title  = "Dashboard"

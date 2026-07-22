@@ -9,7 +9,7 @@ Fixes from v1:
 
 Plan durations: 1 week (7 days), 2 weeks (14 days), 1 month (28 days)
 """
-
+import random 
 from datetime import timedelta, date
 from django.utils import timezone
 from .models import Meal, MealPlan, MealPlanEntry
@@ -47,7 +47,7 @@ FOOD_FAMILIES = {
     'plantain':    ['fried plantain', 'plantain porridge', 'roasted plantain', 'bole'],
     'beans':       ['beans', 'moi moi', 'akara'],
 }
-
+SWALLOW_FAMILIES = {'amala', 'eba', 'pounded_yam', 'fufu', 'semo', 'tuwo'}
 MAX_FAMILY_PER_WEEK = 2   # same food family max 2x per week
 MAX_FAMILY_PER_DAY  = 1   # same food family max 1x per day
 
@@ -101,14 +101,27 @@ def _get_scored_meals(goal, user=None):
     return scored
 
 
+
+
+def _is_swallow_ok(meal, day_family_set):
+    """
+    Hard constraint — never relaxed, even in fallback passes.
+    Prevents two different swallows landing on the same day
+    (e.g. Amala for lunch, Pounded Yam for dinner).
+    """
+    family = _get_food_family(meal.food_name)
+    if family in SWALLOW_FAMILIES and any(f in SWALLOW_FAMILIES for f in day_family_set):
+        return False
+    return True
+
+
 def _pick_for_slot(slot, budget, scored_meals, used_ids,
                    week_family_count, day_family_set):
     """
-    Pick the best available meal for a slot respecting:
-    - Calorie budget (±TOLERANCE)
-    - Not already used (used_ids)
-    - Variety: food family not overused this week
-    - Variety: food family not repeated today
+    Pick the best available meal for a slot respecting constraints,
+    with controlled randomness to allow for regeneration variety.
+
+    Returns a (meal, score) tuple, or (None, None) if nothing fits.
     """
     min_kcal = budget * (1 - TOLERANCE)
     max_kcal = budget * (1 + TOLERANCE)
@@ -117,25 +130,23 @@ def _pick_for_slot(slot, budget, scored_meals, used_ids,
         family = _get_food_family(meal.food_name)
         if family is None:
             return True
+
+        # 1. Prevent the exact same family today
         if family in day_family_set:
-            return False   # already had this family today
+            return False
+
+        # 2. Prevent multiple different swallows in one day
+        if not _is_swallow_ok(meal, day_family_set):
+            return False
+
+        # 3. Prevent overusing a family across the week
         if week_family_count.get(family, 0) >= MAX_FAMILY_PER_WEEK:
-            return False   # used this family too much this week
+            return False
+
         return True
 
-    # Pass 1: strict budget + variety
-    for meal, score in scored_meals:
-        if meal.id in used_ids:
-            continue
-        times = [t.strip() for t in meal.meal_time.split(',')]
-        if slot not in times:
-            continue
-        if not (min_kcal <= meal.calories_kcal <= max_kcal):
-            continue
-        if is_variety_ok(meal):
-            return meal
-
-    # Pass 2: relax variety constraint, keep budget
+    # PASS 1: Strict budget + variety (Pool the top 3 and pick randomly)
+    pass_1_candidates = []
     for meal, score in scored_meals:
         if meal.id in used_ids:
             continue
@@ -143,9 +154,34 @@ def _pick_for_slot(slot, budget, scored_meals, used_ids,
         if slot not in times:
             continue
         if min_kcal <= meal.calories_kcal <= max_kcal:
-            return meal
+            if is_variety_ok(meal):
+                pass_1_candidates.append((meal, score))
+                # Stop looking once we have 3 excellent choices
+                if len(pass_1_candidates) >= 3:
+                    break
 
-    # Pass 3: relax everything, just pick closest calorie match
+    if pass_1_candidates:
+        return random.choice(pass_1_candidates)
+
+    # PASS 2: Relax week/day-family variety, but swallow rule stays hard
+    pass_2_candidates = []
+    for meal, score in scored_meals:
+        if meal.id in used_ids:
+            continue
+        times = [t.strip() for t in meal.meal_time.split(',')]
+        if slot not in times:
+            continue
+        if not _is_swallow_ok(meal, day_family_set):
+            continue
+        if min_kcal <= meal.calories_kcal <= max_kcal:
+            pass_2_candidates.append((meal, score))
+            if len(pass_2_candidates) >= 3:
+                break
+
+    if pass_2_candidates:
+        return random.choice(pass_2_candidates)
+
+    # PASS 3: Relax budget too, just pick closest calorie match — swallow rule still hard
     candidates = []
     for meal, score in scored_meals:
         if meal.id in used_ids:
@@ -153,14 +189,35 @@ def _pick_for_slot(slot, budget, scored_meals, used_ids,
         times = [t.strip() for t in meal.meal_time.split(',')]
         if slot not in times:
             continue
+        if not _is_swallow_ok(meal, day_family_set):
+            continue
         diff = abs(meal.calories_kcal - budget)
         candidates.append((diff, score, meal))
 
     if candidates:
         candidates.sort(key=lambda x: (x[0], -x[1]))
-        return candidates[0][2]
+        # Pick from the top 2 closest matches
+        top_closest = [(c[2], c[1]) for c in candidates[:2]]
+        return random.choice(top_closest)
 
-    return None
+    # PASS 4: Absolute last resort — drop the swallow rule too, so a slot
+    # is never left empty. Should be rare; worth logging if it triggers.
+    fallback_candidates = []
+    for meal, score in scored_meals:
+        if meal.id in used_ids:
+            continue
+        times = [t.strip() for t in meal.meal_time.split(',')]
+        if slot not in times:
+            continue
+        diff = abs(meal.calories_kcal - budget)
+        fallback_candidates.append((diff, score, meal))
+
+    if fallback_candidates:
+        fallback_candidates.sort(key=lambda x: (x[0], -x[1]))
+        top_closest = [(c[2], c[1]) for c in fallback_candidates[:2]]
+        return random.choice(top_closest)
+
+    return None, None
 
 
 def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
@@ -223,7 +280,7 @@ def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
             budget   = daily_target * ratio
             excluded = used_ids | day_used_ids
 
-            meal = _pick_for_slot(
+            meal, score = _pick_for_slot(
                 slot, budget, scored_meals, excluded,
                 week_family_count, day_family_set
             )
@@ -242,6 +299,7 @@ def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
                         day          = day_number,
                         meal_time    = slot,
                         portion_size = 1.0,
+                        match_score  = round(score, 2) if score is not None else 0.5,
                     )
                 )
 
@@ -253,6 +311,48 @@ def generate_weekly_plan(user, profile, duration='1_week', regenerate=False):
 
     MealPlanEntry.objects.bulk_create(entries_to_create)
     return plan
+def get_match_reason(meal, score, goal):
+    """
+    Generate short, human-readable microcopy explaining why a meal
+    was recommended. Rule-based — reads signals already computed
+    (LightGBM score, meal macros, user's goal), not a separate model.
+
+    Priority order: strongest/most specific signal wins, so a meal
+    doesn't get a generic reason when a sharper one applies.
+    """
+    goal_clean = (goal or '').lower()
+
+    # ── High confidence from the model itself ──────────────────────
+    if score is not None and score >= 0.85:
+        return "Strong AI match for your goal"
+
+    # ── Goal-specific macro signals ─────────────────────────────────
+    if goal_clean == 'weight_gain' and meal.calories_kcal >= 700:
+        return "Calorie-dense pick to support weight gain"
+
+    if goal_clean == 'weight_gain' and meal.protein_g >= 30:
+        return "High-protein pick to support weight gain"
+
+    if goal_clean == 'weight_loss' and meal.calories_kcal <= 500:
+        return "Lower-calorie choice to support your goal"
+
+    if goal_clean == 'weight_loss' and meal.protein_g >= 25:
+        return "High-protein, helps keep you full"
+
+    if goal_clean == 'maintenance' and score is not None and score >= 0.6:
+        return "Well-balanced pick for maintenance"
+
+    # ── Taste / cultural signals (nice to have, lower priority) ─────
+    if getattr(meal, 'taste_profile', None):
+        taste = meal.taste_profile.lower()
+        if 'spicy' in taste:
+            return "Popular spicy favorite"
+
+    # ── Fallback — still true, just less specific ────────────────────
+    if score is not None and score >= 0.6:
+        return "Good match for your goal"
+
+    return "Matched to your profile"
 
 
 def get_today_meals(plan):
@@ -287,6 +387,9 @@ def get_week_plan_display(plan, week_offset=0):
     """
     Get 7 days of the plan for display in the weekly calendar.
     week_offset=0 = first 7 days of plan, week_offset=1 = days 8-14, etc.
+
+    Each slot now carries both the meal and its match_score, so the
+    template can show the AI confidence inline without a second query.
     """
     today     = timezone.now().date()
     start_day = (week_offset * 7) + 1
@@ -298,39 +401,45 @@ def get_week_plan_display(plan, week_offset=0):
         day__lte  = end_day,
     ).select_related('meal')
 
-    # Group by day
+    # Group by day — store the whole entry now, not just entry.meal,
+    # so match_score travels with it.
     day_entries = {}
     for entry in entries:
         if entry.day not in day_entries:
             day_entries[entry.day] = {}
-        day_entries[entry.day][entry.meal_time] = entry.meal
+        day_entries[entry.day][entry.meal_time] = entry
 
     days_display = []
     day_names    = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
                     'Friday', 'Saturday', 'Sunday']
 
     for i, day_num in enumerate(range(start_day, end_day + 1)):
-        meals    = day_entries.get(day_num, {})
+        slots    = day_entries.get(day_num, {})
         day_date = plan.start_date + timedelta(days=day_num - 1)
 
-        breakfast = meals.get('breakfast')
-        lunch     = meals.get('lunch')
-        dinner    = meals.get('dinner')
-        snack     = meals.get('snack')
+        breakfast_entry = slots.get('breakfast')
+        lunch_entry     = slots.get('lunch')
+        dinner_entry    = slots.get('dinner')
+        snack_entry     = slots.get('snack')
 
-        total_kcal = sum(
-            m.calories_kcal for m in [breakfast, lunch, dinner, snack] if m
-        )
+        meals_for_total = [
+            e.meal for e in [breakfast_entry, lunch_entry, dinner_entry, snack_entry] if e
+        ]
+        total_kcal = sum(m.calories_kcal for m in meals_for_total)
 
         days_display.append({
             'day_number': day_num,
             'day_name':   day_names[i % 7],
             'date':       day_date.strftime('%b %d'),
             'is_today':   day_date == today,
-            'breakfast':  breakfast,
-            'lunch':      lunch,
-            'dinner':     dinner,
-            'snack':      snack,
+            'breakfast':  breakfast_entry.meal if breakfast_entry else None,
+            'lunch':      lunch_entry.meal if lunch_entry else None,
+            'dinner':     dinner_entry.meal if dinner_entry else None,
+            'snack':      snack_entry.meal if snack_entry else None,
+            'breakfast_score': breakfast_entry.match_score if breakfast_entry else None,
+            'lunch_score':     lunch_entry.match_score if lunch_entry else None,
+            'dinner_score':    dinner_entry.match_score if dinner_entry else None,
+            'snack_score':     snack_entry.match_score if snack_entry else None,
             'total_kcal': total_kcal,
         })
 

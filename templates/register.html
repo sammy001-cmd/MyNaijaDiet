@@ -146,7 +146,7 @@
 </footer>
 {% endblock %}
 
-{% block extra_js %}
+<script>
 function togglePassword() {
     const pass = document.getElementById('password');
     pass.type = pass.type === 'password' ? 'text' : 'password';
@@ -185,4 +185,4 @@ function toggleChip(btn, value) {
     btn.classList.add('bg-primary-container/10', 'border-primary', 'text-primary');
     btn.classList.remove('border-outline-variant');
 }
-{% endblock %}
+</script>

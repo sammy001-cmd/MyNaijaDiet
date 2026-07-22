@@ -1,0 +1,112 @@
+{% extends "staff/admin_base.html" %}
+{% block title %}Admin Dashboard | MyNaijaDiet{% endblock %}
+
+{% block content %}
+<div class="px-4 md:px-8 py-8 max-w-6xl mx-auto">
+
+  <div class="mb-8">
+    <h1 class="font-display font-semibold text-3xl" style="color: var(--ink);">
+      {% if request.user.is_superuser %}Admin Dashboard{% else %}Staff Dashboard{% endif %}
+    </h1>
+    <p class="text-sm mt-1" style="color: var(--ink-soft);">Welcome back, {{ request.user.first_name }}.</p>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+    <div class="mb-4 px-4 py-3 rounded-xl text-sm font-semibold" style="background: var(--forest-soft); color: var(--forest);">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm">
+      <div class="flex items-center gap-1.5 mb-1" style="color: var(--forest);">
+        <span class="material-symbols-outlined text-[16px]">restaurant</span>
+        <span class="text-xs font-bold uppercase tracking-wider">Total Meals</span>
+      </div>
+      <span class="font-display text-3xl font-semibold" style="color: var(--ink);">{{ total_meals }}</span>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm">
+      <div class="flex items-center gap-1.5 mb-1 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px]">group</span>
+        <span class="text-xs font-bold uppercase tracking-wider">Users</span>
+      </div>
+      <span class="font-display text-3xl font-semibold" style="color: var(--ink);">{{ total_users }}</span>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm">
+      <div class="flex items-center gap-1.5 mb-1" style="color: var(--pepper);">
+        <span class="material-symbols-outlined text-[16px]">pending_actions</span>
+        <span class="text-xs font-bold uppercase tracking-wider">Pending Review</span>
+      </div>
+      <span class="font-display text-3xl font-semibold" style="color: var(--ink);">{{ pending_count }}</span>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm">
+      <div class="flex items-center gap-1.5 mb-1" style="color: var(--gold);">
+        <span class="material-symbols-outlined text-[16px]">star</span>
+        <span class="text-xs font-bold uppercase tracking-wider">Avg Rating</span>
+      </div>
+      <span class="font-display text-3xl font-semibold" style="color: var(--ink);">
+        {% if avg_rating %}{{ avg_rating|floatformat:1 }}{% else %}—{% endif %}
+      </span>
+      <span class="text-xs text-on-surface-variant">{{ feedback_count }} ratings</span>
+    </div>
+  </div>
+
+  <!-- Quick actions -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <a href="{% url 'propose_new_meal' %}" class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background: var(--forest-soft);">
+        <span class="material-symbols-outlined" style="color: var(--forest);">add_circle</span>
+      </div>
+      <div>
+        <p class="font-bold text-sm" style="color: var(--ink);">Propose a New Meal</p>
+        <p class="text-xs" style="color: var(--ink-soft);">Submit a dish for super admin approval</p>
+      </div>
+    </a>
+
+    {% if request.user.is_superuser %}
+    <a href="{% url 'review_queue' %}" class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background: var(--pepper-soft);">
+        <span class="material-symbols-outlined" style="color: var(--pepper);">fact_check</span>
+      </div>
+      <div>
+        <p class="font-bold text-sm" style="color: var(--ink);">Review Pending Proposals</p>
+        <p class="text-xs" style="color: var(--ink-soft);">{{ pending_count }} awaiting your decision</p>
+      </div>
+    </a>
+    {% else %}
+    <a href="{% url 'meal_edit_queue' %}" class="bg-white rounded-2xl p-5 border border-outline-variant/10 shadow-sm hover:shadow-md transition-all flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background: var(--forest-soft);">
+        <span class="material-symbols-outlined" style="color: var(--forest);">edit_note</span>
+      </div>
+      <div>
+        <p class="font-bold text-sm" style="color: var(--ink);">My Proposals</p>
+        <p class="text-xs" style="color: var(--ink-soft);">{{ my_pending }} pending review</p>
+      </div>
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Recent activity -->
+  <h2 class="font-display font-semibold text-lg mb-4" style="color: var(--ink);">Recent Proposal Activity</h2>
+  <div class="bg-white rounded-2xl border border-outline-variant/10 shadow-sm overflow-hidden">
+    {% for edit in recent_proposals %}
+    <div class="flex items-center justify-between px-6 py-3 {% if not forloop.last %}border-b border-outline-variant/10{% endif %}">
+      <div>
+        <p class="text-sm font-semibold" style="color: var(--ink);">
+          {{ edit.get_action_display }} — {% if edit.target_meal %}{{ edit.target_meal.food_name }}{% else %}{{ edit.payload.food_name|default:"New Meal" }}{% endif %}
+        </p>
+        <p class="text-xs" style="color: var(--ink-soft);">by {{ edit.submitted_by.get_full_name }} · {{ edit.created_at|timesince }} ago</p>
+      </div>
+      <span class="status-{{ edit.status }} text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">{{ edit.get_status_display }}</span>
+    </div>
+    {% empty %}
+    <p class="text-center py-10 text-sm" style="color: var(--ink-soft);">No activity yet.</p>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
