@@ -9,6 +9,21 @@ python manage.py migrate
 # 1. Load the meals dataset into the live database
 python manage.py load_meals
 
-# 2. Create the superuser automatically (the '|| true' part prevents the build from crashing on future deploys if the user already exists)
-# 2. Create the superuser automatically using ONLY the email
-python manage.py createsuperuser --noinput --email $ADMIN_EMAIL || true
+# 2. Create the superuser directly via the Django ORM
+python manage.py shell <<EOF
+import os
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+email = os.environ.get('ADMIN_EMAIL')
+password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
+
+if email and password:
+    if not User.objects.filter(email=email).exists():
+        User.objects.create_superuser(email=samueltoluwani169@gmail.com', password=samnaija001)
+        print("✅ Superuser created successfully!")
+    else:
+        print("✅ Superuser already exists.")
+else:
+    print("⚠️ Missing environment variables. Superuser not created.")
+EOF
