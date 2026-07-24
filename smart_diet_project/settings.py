@@ -130,6 +130,15 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Cloudinary Storage for User & Staff Media Uploads
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'yhzhrspr'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '511412584589175'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'WOKvVza8OyuRidw3jzr6hmaBjz4'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # to stop the tensorflow warning messages
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
