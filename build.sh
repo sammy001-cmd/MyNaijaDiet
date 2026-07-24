@@ -10,4 +10,5 @@ python manage.py migrate
 python manage.py load_meals
 
 # 2. Create the superuser automatically (the '|| true' part prevents the build from crashing on future deploys if the user already exists)
-python manage.py createsuperuser --noinput --username $ADMIN_USERNAME --email $ADMIN_EMAIL || true
+# 2. Create the superuser automatically using ONLY the email
+python manage.py createsuperuser --noinput --email $ADMIN_EMAIL || true
