@@ -79,7 +79,7 @@ desktop.ini
 
 # ── Static files (generated) ─────────────────────────────
 staticfiles/
-static/css/output.css
+# static/css/output.css
 
 # ── Jupyter ───────────────────────────────────────────────
 .ipynb_checkpoints
