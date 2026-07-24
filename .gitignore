@@ -30,16 +30,18 @@ db.sqlite3
 db.sqlite3-journal
 media/
 
-# ── ML Models (too large for GitHub) ─────────────────────
+# ── ML Models ────────────────────────────────────────────
+# Ignore keras/heavy models you aren't using right now
 recommender/ml/*.keras
-recommender/ml/*.pkl
-recommender/ml/random_forest.pkl
-recommender/ml/lightgbm.pkl
 recommender/ml/ann.keras
 recommender/ml/lstm.keras
-recommender/ml/feature_names.pkl
-models/
-encoders/
+recommender/ml/random_forest.pkl
+
+# WE NEED THESE FOR PRODUCTION - Do not ignore them:
+# !recommender/ml/lightgbm.pkl
+# !recommender/ml/feature_names.pkl
+# !models/
+# !encoders/
 
 # ── Dataset files ─────────────────────────────────────────
 *.csv
