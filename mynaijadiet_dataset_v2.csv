@@ -1,0 +1,372 @@
+food_name,category,region,meal_time,calories_kcal,protein_g,carb_g,fat_g,goal_suitability,diet_type,taste_profile,prep_time,price_range
+Amala and Ewedu Soup,lunch,Yoruba/Southwest,"breakfast,lunch,dinner",370,22,52,10,maintenance,balanced,savory,medium,low
+Amala and Ewedu and Gbegiri,lunch,Yoruba/Southwest,"lunch,dinner",430,26,56,14,weight_gain,high-protein,savory,medium,low
+Amala and Egusi Soup,lunch,Yoruba/Southwest,"lunch,dinner",720,34,62,35,weight_gain,energy-rich,savory,medium,low
+Amala and Okra Soup,lunch,Yoruba/Southwest,"lunch,dinner",480,25,58,16,maintenance,balanced,savory,medium,low
+Amala and Efo Riro,lunch,Yoruba/Southwest,"lunch,dinner",550,28,60,20,maintenance,balanced,savory,medium,low
+Amala and Gbegiri,lunch,Yoruba/Southwest,"lunch,dinner",450,24,60,13,maintenance,balanced,savory,medium,low
+Amala and Ogbono Soup,lunch,Yoruba/Southwest,"lunch,dinner",680,30,62,32,weight_gain,energy-rich,savory,medium,low
+Amala and Bitterleaf Soup,lunch,Yoruba/Southwest,"lunch,dinner",510,26,58,18,maintenance,balanced,bitter-savory,medium,low
+Amala and Ewedu with Beef,lunch,Yoruba/Southwest,"lunch,dinner",420,28,52,14,weight_gain,high-protein,savory,medium,medium
+Amala and Ewedu with Fish,lunch,Yoruba/Southwest,"lunch,dinner",400,26,52,12,weight_gain,high-protein,savory,medium,medium
+Amala and Okra with Beef,lunch,Yoruba/Southwest,"lunch,dinner",520,30,58,18,weight_gain,high-protein,savory,medium,medium
+Amala and Afang Soup,lunch,Yoruba/Southwest,"lunch,dinner",600,30,60,24,weight_gain,high-protein,savory,medium,medium
+Amala and Vegetable Soup,lunch,Yoruba/Southwest,"lunch,dinner",490,24,58,16,maintenance,balanced,savory,medium,low
+Eba and Egusi Soup,lunch,General,"lunch,dinner",780,35,68,36,weight_gain,energy-rich,savory,short,low
+Eba and Okra Soup,lunch,General,"lunch,dinner",520,24,64,16,maintenance,balanced,savory,short,low
+Eba and Efo Riro,lunch,Yoruba/Southwest,"lunch,dinner",580,26,66,20,maintenance,balanced,savory,short,low
+Eba and Afang Soup,lunch,South-South,"lunch,dinner",640,32,65,26,weight_gain,high-protein,savory,medium,medium
+Eba and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",570,27,64,20,maintenance,balanced,savory,medium,low
+Eba and Bitterleaf Soup,lunch,General,"lunch,dinner",540,25,64,18,maintenance,balanced,bitter-savory,medium,low
+Eba and Ogbono Soup,lunch,General,"lunch,dinner",710,30,68,32,weight_gain,energy-rich,savory,medium,low
+Eba and Edikaikong Soup,lunch,South-South,"lunch,dinner",620,30,64,24,weight_gain,high-protein,savory,medium,medium
+Eba and Ewedu Soup,lunch,Yoruba/Southwest,"lunch,dinner",400,22,58,10,maintenance,balanced,savory,short,low
+Eba and Vegetable Soup,lunch,General,"lunch,dinner",560,26,64,20,maintenance,balanced,savory,short,low
+Eba and Egusi with Chicken,lunch,General,"lunch,dinner",820,40,68,36,weight_gain,high-protein,savory,short,medium
+Eba and Onugbu Soup,lunch,Southeast/Igbo,"lunch,dinner",530,24,64,18,maintenance,balanced,bitter-savory,medium,low
+Pounded Yam and Egusi Soup,lunch,General,"lunch,dinner",870,36,78,38,weight_gain,energy-rich,savory,long,medium
+Pounded Yam and Efo Riro,lunch,Yoruba/Southwest,"lunch,dinner",700,28,75,24,weight_gain,energy-rich,savory,long,medium
+Pounded Yam and Okra Soup,lunch,General,"lunch,dinner",660,26,74,20,maintenance,energy-rich,savory,long,medium
+Pounded Yam and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",720,30,74,26,weight_gain,energy-rich,savory,long,medium
+Pounded Yam and Ogbono Soup,lunch,General,"lunch,dinner",820,32,76,36,weight_gain,energy-rich,savory,long,medium
+Pounded Yam and Afang Soup,lunch,South-South,"lunch,dinner",760,34,74,30,weight_gain,high-protein,savory,long,medium
+Pounded Yam and Bitterleaf Soup,lunch,General,"lunch,dinner",690,28,74,24,maintenance,energy-rich,bitter-savory,long,medium
+Pounded Yam and Vegetable Soup,lunch,General,"lunch,dinner",680,28,76,22,weight_gain,energy-rich,savory,long,medium
+Pounded Yam and Edikaikong,lunch,South-South,"lunch,dinner",780,36,76,32,weight_gain,high-protein,savory,long,medium
+Pounded Yam and Gbegiri,lunch,Yoruba/Southwest,"lunch,dinner",680,28,76,22,weight_gain,energy-rich,savory,long,medium
+Fufu and Egusi Soup,lunch,Southeast/Igbo,"lunch,dinner",730,34,70,36,weight_gain,energy-rich,savory,long,low
+Fufu and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",560,26,66,20,maintenance,balanced,savory,long,low
+Fufu and Afang Soup,lunch,South-South,"lunch,dinner",620,30,66,26,weight_gain,high-protein,savory,long,medium
+Fufu and Bitterleaf Soup,lunch,Southeast/Igbo,"lunch,dinner",500,24,66,18,maintenance,balanced,bitter-savory,long,low
+Fufu and Ogbono Soup,lunch,Southeast/Igbo,"lunch,dinner",680,30,68,32,weight_gain,energy-rich,savory,long,low
+Fufu and Okra Soup,lunch,Southeast/Igbo,"lunch,dinner",480,24,66,16,maintenance,balanced,savory,long,low
+Fufu and Edikaikong Soup,lunch,South-South,"lunch,dinner",590,30,66,24,weight_gain,high-protein,savory,long,medium
+Fufu and Onugbu Soup,lunch,Southeast/Igbo,"lunch,dinner",520,26,66,20,maintenance,balanced,bitter-savory,long,low
+Akpu and Egusi Soup,lunch,Southeast/Igbo,"lunch,dinner",740,34,70,36,weight_gain,energy-rich,savory,long,low
+Akpu and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",560,26,66,20,maintenance,balanced,savory,long,low
+Semo and Egusi Soup,lunch,General,"lunch,dinner",760,34,72,36,weight_gain,energy-rich,savory,short,low
+Semo and Okra Soup,lunch,General,"lunch,dinner",510,24,68,16,maintenance,balanced,savory,short,low
+Semo and Efo Riro,lunch,General,"lunch,dinner",560,26,68,20,maintenance,balanced,savory,short,low
+Semo and Vegetable Soup,lunch,General,"lunch,dinner",580,28,68,22,maintenance,balanced,savory,short,low
+Semo and Ogbono Soup,lunch,General,"lunch,dinner",690,30,70,30,weight_gain,energy-rich,savory,short,low
+Semo and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",540,26,68,20,maintenance,balanced,savory,short,low
+Semo and Afang Soup,lunch,South-South,"lunch,dinner",610,30,68,26,weight_gain,high-protein,savory,short,medium
+Semo and Bitterleaf Soup,lunch,General,"lunch,dinner",520,24,68,18,maintenance,balanced,bitter-savory,short,low
+Semo and Edikaikong,lunch,South-South,"lunch,dinner",620,30,68,24,weight_gain,high-protein,savory,short,medium
+Semo and Egusi with Chicken,lunch,General,"lunch,dinner",820,42,72,36,weight_gain,high-protein,savory,short,medium
+Tuwo Shinkafa and Miyan Kuka,lunch,Hausa/North,"lunch,dinner",490,24,66,14,maintenance,balanced,savory,medium,low
+Tuwo Shinkafa and Miyan Taushe,lunch,Hausa/North,"lunch,dinner",560,26,68,20,maintenance,balanced,savory,medium,low
+Tuwo Shinkafa and Miyan Talbas,lunch,Hausa/North,"lunch,dinner",510,24,68,16,maintenance,balanced,savory,medium,low
+Tuwo Shinkafa and Miyan Kubewa,lunch,Hausa/North,"lunch,dinner",490,22,66,16,maintenance,balanced,savory,medium,low
+Tuwo Shinkafa and Egusi Soup,lunch,Hausa/North,"lunch,dinner",750,32,80,34,weight_gain,energy-rich,savory,medium,low
+Tuwo Masara and Miyan Kuka,lunch,Hausa/North,"lunch,dinner",460,20,68,12,maintenance,balanced,savory,medium,low
+Tuwo Masara and Miyan Taushe,lunch,Hausa/North,"lunch,dinner",520,22,70,16,maintenance,balanced,savory,medium,low
+Wheat Swallow and Efo Riro,lunch,General,"lunch,dinner",520,28,60,18,weight_loss,balanced,savory,medium,low
+Wheat Swallow and Egusi Soup,lunch,General,"lunch,dinner",680,34,64,30,weight_gain,high-protein,savory,medium,low
+Wheat Swallow and Okra Soup,lunch,General,"lunch,dinner",470,24,60,16,weight_loss,balanced,savory,medium,low
+Wheat Swallow and Vegetable Soup,lunch,General,"lunch,dinner",490,26,60,18,weight_loss,balanced,savory,medium,low
+Wheat Swallow and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",510,26,62,18,weight_loss,balanced,savory,medium,low
+Jollof Rice,lunch,General,"breakfast,lunch,dinner",450,9,78,12,maintenance,energy-rich,savory-spicy,medium,medium
+Jollof Rice and Chicken,lunch,General,"breakfast,lunch,dinner",620,32,78,20,weight_gain,high-protein,savory-spicy,medium,medium
+Jollof Rice and Fish,lunch,General,"lunch,dinner",580,28,78,16,weight_gain,high-protein,savory-spicy,medium,medium
+Jollof Rice and Beef,lunch,General,"lunch,dinner",660,34,78,22,weight_gain,high-protein,savory-spicy,medium,medium
+Jollof Rice and Moi Moi,lunch,General,"lunch,dinner",620,28,90,18,maintenance,high-protein,savory,medium,medium
+Jollof Rice and Coleslaw,lunch,General,"lunch,dinner",560,12,86,18,maintenance,balanced,savory,medium,medium
+Party Jollof Rice and Chicken,lunch,General,"lunch,dinner",700,38,78,26,weight_gain,high-protein,savory-smoky,long,high
+Fried Rice and Chicken,lunch,General,"lunch,dinner",650,34,72,24,weight_gain,high-protein,savory,medium,medium
+Fried Rice and Turkey,lunch,General,"lunch,dinner",680,38,72,24,weight_gain,high-protein,savory,medium,high
+Fried Rice and Grilled Chicken,lunch,General,"lunch,dinner",670,40,72,22,weight_gain,high-protein,savory,medium,high
+Fried Rice and Plantain,lunch,General,"lunch,dinner",700,16,110,22,maintenance,energy-rich,sweet-savory,medium,medium
+Vegetable Fried Rice,lunch,General,"lunch,dinner",480,14,74,16,weight_loss,vegetarian,savory,medium,low
+White Rice and Tomato Stew,lunch,General,"breakfast,lunch,dinner",560,24,80,16,maintenance,balanced,savory,medium,low
+White Rice and Egusi Soup,lunch,General,"lunch,dinner",820,32,88,34,weight_gain,energy-rich,savory,medium,medium
+White Rice and Vegetable Soup,lunch,General,"lunch,dinner",620,26,82,20,maintenance,balanced,savory,medium,low
+White Rice and Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",680,28,82,24,maintenance,balanced,savory,medium,medium
+White Rice and Okra Soup,lunch,General,"lunch,dinner",600,24,84,18,maintenance,balanced,savory,medium,low
+White Rice and Curry Stew,lunch,General,"lunch,dinner",590,26,82,16,maintenance,balanced,savory-mild,medium,medium
+White Rice and Pepper Soup,lunch,General,"lunch,dinner",530,26,78,12,weight_loss,high-protein,spicy,medium,medium
+Rice and Beans,lunch,General,"breakfast,lunch,dinner",480,20,84,10,weight_loss,vegetarian,savory,medium,low
+Rice and Beans with Plantain,lunch,General,"lunch,dinner",620,18,112,12,maintenance,vegetarian,sweet-savory,medium,low
+Rice and Beans with Stew,lunch,General,"breakfast,lunch,dinner",580,26,86,14,maintenance,high-protein,savory,medium,low
+Rice and Beans with Egg,lunch,General,"breakfast,lunch,dinner",520,22,86,12,maintenance,high-protein,savory,medium,low
+Coconut Rice and Chicken,lunch,South-South,"lunch,dinner",680,26,84,26,maintenance,indulgent,mild-sweet,medium,medium
+Ofada Rice and Ayamase Stew,lunch,Yoruba/Southwest,"lunch,dinner",720,30,82,28,maintenance,indulgent,spicy,long,medium
+Banga Rice,lunch,South-South,"lunch,dinner",680,22,86,24,maintenance,energy-rich,savory,long,medium
+Yam and Egg Sauce,breakfast,General,"breakfast,lunch,dinner",520,22,68,18,maintenance,high-protein,savory,medium,low
+Yam and Egg Sauce with Fish,breakfast,General,"breakfast,lunch",620,30,68,24,weight_gain,high-protein,savory,medium,medium
+Yam and Tomato Stew,breakfast,General,"breakfast,lunch,dinner",480,18,72,14,maintenance,balanced,savory,medium,low
+Yam and Palm Oil,breakfast,General,"breakfast,lunch,dinner",380,4,72,10,maintenance,vegetarian,mild,short,low
+Yamarita,breakfast,General,"breakfast,lunch",560,18,74,22,maintenance,balanced,savory,medium,low
+Yamarita and Tomato Stew,breakfast,General,"breakfast,lunch",640,24,78,26,maintenance,balanced,savory,medium,medium
+Yam Porridge,lunch,General,"breakfast,lunch,dinner",490,14,78,14,maintenance,vegetarian,savory,medium,low
+Yam and Vegetable Porridge,lunch,General,"breakfast,lunch,dinner",430,14,72,12,weight_loss,vegetarian,savory,medium,low
+Fried Yam and Pepper Sauce,snack,General,"breakfast,lunch,snack",480,6,76,18,maintenance,vegetarian,spicy,medium,low
+Fried Yam and Egg,breakfast,General,"breakfast,lunch,snack",560,20,74,22,maintenance,high-protein,savory,medium,low
+Yam and Beans Porridge,lunch,General,"lunch,dinner",460,18,80,12,maintenance,vegetarian,savory,medium,low
+Fried Plantain and Egg,breakfast,General,"breakfast,lunch,dinner",520,16,74,20,maintenance,balanced,sweet-savory,short,low
+Fried Plantain and Rice,lunch,General,"lunch,dinner",680,14,116,18,maintenance,energy-rich,sweet-savory,medium,low
+Fried Plantain and Beans,lunch,General,"breakfast,lunch,dinner",580,20,98,14,maintenance,balanced,sweet-savory,medium,low
+Plantain Porridge,lunch,General,"lunch,dinner",420,12,74,12,weight_loss,vegetarian,savory,medium,low
+Unripe Plantain Porridge,lunch,General,"lunch,dinner",380,12,68,10,weight_loss,vegetarian,savory,medium,low
+Bole and Roasted Fish,snack,South-South,"lunch,snack,dinner",450,28,60,14,weight_gain,high-protein,smoky-spicy,medium,low
+Roasted Plantain and Fish,snack,South-South,"lunch,snack,dinner",480,30,60,16,weight_gain,high-protein,spicy-smoky,medium,medium
+Dodo Ikire,snack,Yoruba/Southwest,"snack,lunch",280,2,52,10,maintenance,vegetarian,sweet-spicy,short,low
+Beans Porridge,lunch,General,"breakfast,lunch,dinner",400,22,60,12,weight_loss,high-protein,savory,medium,low
+Beans and Bread,breakfast,Yoruba/Southwest,"breakfast,lunch,dinner",480,20,74,12,maintenance,high-protein,savory,medium,low
+Ewa Agoyin and Agege Bread,breakfast,Yoruba/Southwest,"breakfast,lunch",500,20,76,14,maintenance,high-protein,spicy-savory,long,low
+Beans and Fried Plantain,lunch,General,"lunch,dinner",560,20,96,14,maintenance,balanced,sweet-savory,medium,low
+Moi Moi,snack,General,"breakfast,lunch,snack",210,14,22,8,weight_loss,high-protein,mild-savory,long,low
+Moi Moi and Pap,breakfast,General,"breakfast,dinner",350,18,50,10,weight_loss,high-protein,mild-savory,long,low
+Akara and Pap,breakfast,General,"breakfast,dinner",340,16,46,12,weight_loss,high-protein,savory,medium,low
+Akara and Custard,breakfast,General,"breakfast,dinner",420,18,58,14,weight_loss,high-protein,savory-sweet,medium,low
+Moi Moi and Custard,breakfast,General,"breakfast,dinner",380,20,50,12,weight_loss,high-protein,mild,long,low
+Moi Moi and Jollof Rice,lunch,General,"lunch,dinner",580,26,82,16,maintenance,high-protein,savory,long,medium
+Gbegiri Soup with Rice,lunch,Yoruba/Southwest,"lunch,dinner",580,26,82,18,maintenance,high-protein,savory,medium,low
+Bread and Fried Egg,breakfast,General,"breakfast,lunch,dinner",430,18,52,16,maintenance,balanced,savory,short,low
+Bread and Tea,breakfast,General,"breakfast,lunch,dinner",320,8,58,8,weight_loss,low-calorie,mild-sweet,short,low
+Bread and Tea with Egg,breakfast,General,"breakfast,lunch,dinner",480,20,58,18,maintenance,balanced,mild-sweet,short,low
+Bread and Butter,breakfast,General,"breakfast,lunch,dinner",340,6,52,14,maintenance,low-calorie,mild,short,low
+Toasted Bread and Egg,breakfast,General,"breakfast,lunch,dinner",400,18,48,16,maintenance,balanced,savory,short,low
+Beans and Toast Bread,breakfast,Yoruba/Southwest,"breakfast,lunch,dinner",450,20,68,12,maintenance,high-protein,savory,medium,low
+Bread and Sardines,breakfast,General,"breakfast,lunch,dinner",410,22,50,16,maintenance,high-protein,savory,short,low
+Bread and Corned Beef,breakfast,General,"breakfast,lunch,dinner",440,20,52,18,maintenance,high-protein,savory,short,low
+Agege Bread and Ewa Agoyin,breakfast,Yoruba/Southwest,"breakfast,lunch",500,20,76,14,maintenance,high-protein,spicy-savory,long,low
+Tea and Bread with Boiled Egg,breakfast,General,"breakfast,lunch,dinner",400,16,56,14,maintenance,balanced,mild,short,low
+Boiled Egg and Bread,breakfast,General,"breakfast,lunch,dinner",380,18,44,16,weight_loss,high-protein,mild,short,low
+Indomie Noodles with Egg,snack,General,"breakfast,lunch,dinner,snack",460,18,58,18,maintenance,balanced,savory-spicy,short,low
+Indomie Noodles with Vegetables,snack,General,"breakfast,lunch,dinner,snack",380,10,60,12,weight_loss,low-calorie,savory-spicy,short,low
+Indomie with Chicken,dinner,General,"lunch,dinner,snack",510,26,58,18,maintenance,high-protein,savory-spicy,short,medium
+Indomie Stir Fry with Vegetables,dinner,General,"lunch,dinner,snack",400,10,62,14,weight_loss,low-calorie,savory-spicy,short,low
+Spaghetti and Egg Sauce,dinner,General,"lunch,dinner",550,22,78,18,maintenance,balanced,savory,medium,low
+Spaghetti and Tomato Stew,dinner,General,"lunch,dinner",600,28,78,18,maintenance,high-protein,savory,medium,low
+Spaghetti Bolognese Nigerian Style,dinner,General,"lunch,dinner",620,30,78,20,maintenance,high-protein,savory,medium,medium
+Macaroni and Tomato Stew,dinner,General,"lunch,dinner",570,24,76,18,maintenance,balanced,savory,medium,medium
+Spaghetti and Vegetables,dinner,General,"lunch,dinner",490,14,78,14,weight_loss,vegetarian,savory,medium,low
+Custard and Milk,breakfast,General,"breakfast,dinner",280,8,50,6,weight_loss,low-calorie,sweet,short,low
+Custard and Moi Moi,breakfast,General,"breakfast,dinner",430,18,66,12,weight_loss,high-protein,sweet-savory,medium,low
+Oatmeal with Milk,breakfast,General,"breakfast,dinner",320,10,54,8,weight_loss,low-calorie,mild-sweet,short,low
+Oatmeal with Egg,breakfast,General,"breakfast,dinner",400,18,54,12,weight_gain,high-protein,mild,short,low
+Oatmeal with Banana and Honey,breakfast,General,"breakfast,dinner",380,10,66,8,weight_loss,low-calorie,sweet,short,low
+Oatmeal Dinner Bowl,breakfast,General,"breakfast,dinner",440,16,62,14,weight_loss,balanced,sweet,short,low
+Cornflakes and Milk,breakfast,General,"breakfast,dinner",290,8,56,6,weight_loss,low-calorie,sweet,short,low
+Cornflakes with Banana,breakfast,General,"breakfast,dinner",340,8,64,6,weight_loss,low-calorie,sweet,short,low
+Pap with Milk,breakfast,General,"breakfast,dinner",240,6,46,6,weight_loss,low-calorie,mild-sweet,short,low
+Pap and Akara,breakfast,General,"breakfast,dinner",340,16,46,12,weight_loss,high-protein,savory,medium,low
+Pancakes,breakfast,General,"breakfast,dinner",380,12,58,14,maintenance,balanced,sweet,short,low
+Pancakes with Honey,breakfast,General,"breakfast,dinner",420,12,68,14,maintenance,balanced,sweet,short,low
+Fried Egg Plain,breakfast,General,"breakfast,lunch,dinner",180,12,2,14,weight_loss,high-protein,savory,short,low
+Boiled Eggs,breakfast,General,"breakfast,lunch,dinner,snack",140,12,2,10,weight_loss,high-protein,mild,short,low
+Fried Egg and Agege Bread,breakfast,Yoruba/Southwest,"breakfast,lunch,dinner",460,18,54,18,maintenance,balanced,savory,short,low
+Noodles and Egg,breakfast,General,"breakfast,lunch,dinner,snack",420,18,54,16,maintenance,balanced,savory-spicy,short,low
+Rice and Egg,breakfast,General,"breakfast,lunch,dinner",480,18,72,14,maintenance,high-protein,savory,short,low
+Cereal and Milk,breakfast,General,"breakfast,dinner",290,8,54,6,weight_loss,low-calorie,sweet,short,medium
+Masa and Miyan Taushe,breakfast,Hausa/North,"breakfast,lunch",480,20,72,16,maintenance,balanced,savory,long,low
+Catfish Pepper Soup,dinner,South-South,"lunch,dinner,snack",220,30,6,8,weight_loss,high-protein,spicy,medium,medium
+Goat Meat Pepper Soup,dinner,General,"lunch,dinner,snack",260,28,8,12,weight_loss,high-protein,spicy,medium,medium
+Chicken Pepper Soup,dinner,General,"lunch,dinner,snack",240,28,6,10,weight_loss,high-protein,spicy,medium,medium
+Egusi Soup,lunch,General,"lunch,dinner",480,24,18,36,weight_gain,high-protein,savory,long,medium
+Efo Riro,lunch,Yoruba/Southwest,"lunch,dinner",340,22,14,22,weight_loss,high-protein,savory,medium,medium
+Okra Soup,lunch,General,"lunch,dinner",280,18,16,18,weight_loss,high-protein,savory,medium,medium
+Oha Soup,lunch,Southeast/Igbo,"lunch,dinner",310,20,16,20,weight_loss,high-protein,savory,long,medium
+Fisherman Soup,dinner,South-South,"lunch,dinner",350,36,10,18,weight_loss,high-protein,spicy,long,high
+Ukwa Porridge,lunch,Southeast/Igbo,"lunch,dinner",490,16,76,16,maintenance,vegetarian,savory,long,low
+Abacha (African Salad),snack,Southeast/Igbo,"lunch,snack",380,16,48,16,maintenance,balanced,sour-savory,medium,medium
+Starch and Banga Soup,lunch,South-South,"lunch,dinner",680,28,82,28,weight_gain,energy-rich,savory,long,medium
+Banga Soup and Rice,lunch,South-South,"lunch,dinner",720,30,88,26,weight_gain,energy-rich,savory,long,medium
+Danwake,lunch,Hausa/North,"lunch,dinner",420,18,62,14,maintenance,vegetarian,savory-sour,medium,low
+Shawarma Chicken,snack,General,"lunch,dinner,snack",520,32,52,20,maintenance,high-protein,savory-spicy,medium,high
+Shawarma Beef,snack,General,"lunch,dinner,snack",580,34,52,26,weight_gain,high-protein,savory-spicy,medium,high
+Shawarma and Fries,snack,General,"lunch,dinner,snack",780,32,92,32,maintenance,indulgent,savory-spicy,medium,high
+Suya,snack,Hausa/North,"lunch,dinner,snack",280,26,8,16,weight_loss,high-protein,spicy-smoky,medium,medium
+Chicken Suya,snack,Hausa/North,"lunch,dinner,snack",250,28,6,12,weight_loss,high-protein,spicy-smoky,medium,medium
+Suya and Onions,snack,Hausa/North,"lunch,dinner,snack",300,26,10,16,weight_loss,high-protein,spicy-smoky,medium,medium
+Kilishi,snack,Hausa/North,snack,300,30,10,14,weight_gain,high-protein,spicy-savory,long,medium
+Meat Pie,snack,General,"breakfast,lunch,snack",380,14,44,18,maintenance,balanced,savory,long,medium
+Puff Puff,snack,General,"breakfast,snack",260,4,38,10,maintenance,indulgent,sweet,medium,low
+Chin Chin,snack,General,snack,180,4,24,8,maintenance,indulgent,sweet,long,low
+Sausage Roll,snack,General,"breakfast,snack",340,12,36,18,maintenance,balanced,savory,long,medium
+Doughnut,snack,General,"breakfast,snack",310,6,40,14,maintenance,indulgent,sweet,medium,medium
+Biscuit,snack,General,snack,150,2,22,6,maintenance,indulgent,sweet,long,low
+Popcorn,snack,General,snack,120,3,20,4,weight_loss,low-calorie,savory-sweet,short,low
+Groundnuts,snack,General,snack,170,8,6,14,weight_loss,high-protein,savory,short,low
+Kulikuli,snack,Hausa/North,snack,200,10,10,14,maintenance,high-protein,savory,long,low
+Plantain Chips,snack,General,snack,160,2,28,6,maintenance,low-calorie,savory,medium,low
+Catfish Barbecue,snack,South-South,"lunch,dinner,snack",310,32,8,14,weight_loss,high-protein,spicy-smoky,medium,medium
+Grilled Chicken,snack,General,"lunch,dinner,snack",280,36,2,14,weight_loss,high-protein,savory-spicy,long,high
+Yogurt,snack,General,"breakfast,snack",120,6,16,4,weight_loss,low-calorie,sweet,short,medium
+Fruit Salad,snack,General,"breakfast,snack",110,2,26,1,weight_loss,low-calorie,sweet,short,low
+Mixed Fruits,snack,General,"breakfast,snack",100,1,24,0,weight_loss,low-calorie,sweet,short,low
+Zobo Drink,snack,General,snack,80,1,18,0,weight_loss,low-calorie,sweet-sour,medium,low
+Kunu,snack,Hausa/North,"breakfast,snack",110,3,22,1,weight_loss,low-calorie,mild-sweet,long,low
+Ice Cream,snack,General,snack,200,4,28,10,maintenance,indulgent,sweet,short,medium
+Chapman,snack,General,snack,160,0,40,0,maintenance,indulgent,sweet,short,medium
+Garri and Groundnut,snack,General,snack,300,8,50,10,maintenance,balanced,savory-sweet,short,low
+Garri and Sugar,snack,General,snack,260,4,52,6,maintenance,low-calorie,sweet,short,low
+Malt and Milk,snack,General,snack,200,4,36,6,maintenance,low-calorie,sweet,short,low
+Chocolate and Milk,snack,General,snack,310,6,44,14,maintenance,indulgent,sweet,short,medium
+Puff Puff and Cold Drink,snack,General,snack,380,4,60,14,maintenance,indulgent,sweet,medium,low
+Meat Pie and Juice,snack,General,snack,460,14,60,20,maintenance,balanced,savory,long,medium
+Amala and Ewedu with Chicken,lunch,Yoruba/Southwest,"lunch,dinner",410,28,52,12,weight_gain,high-protein,savory,medium,medium
+Amala and Ewedu with Ponmo,lunch,Yoruba/Southwest,"lunch,dinner",390,24,52,12,maintenance,balanced,savory,medium,low
+Amala and Egusi with Chicken,lunch,Yoruba/Southwest,"lunch,dinner",760,38,62,36,weight_gain,high-protein,savory,medium,medium
+Amala and Egusi with Fish,lunch,Yoruba/Southwest,"lunch,dinner",730,34,62,34,weight_gain,high-protein,savory,medium,medium
+Amala and Efo Riro with Beef,lunch,Yoruba/Southwest,"lunch,dinner",590,32,60,22,weight_gain,high-protein,savory,medium,medium
+Amala and Efo Riro with Fish,lunch,Yoruba/Southwest,"lunch,dinner",570,30,60,20,weight_gain,high-protein,savory,medium,medium
+Amala and Okra with Fish,lunch,Yoruba/Southwest,"lunch,dinner",500,28,58,14,weight_gain,high-protein,savory,medium,medium
+Amala and Gbegiri with Beef,lunch,Yoruba/Southwest,"lunch,dinner",480,28,60,16,weight_gain,high-protein,savory,medium,medium
+Amala and Ogbono with Beef,lunch,Yoruba/Southwest,"lunch,dinner",720,34,62,34,weight_gain,high-protein,savory,medium,medium
+Amala and Ewedu and Gbegiri with Beef,lunch,Yoruba/Southwest,"lunch,dinner",470,30,56,16,weight_gain,high-protein,savory,medium,medium
+Eba and Egusi with Fish,lunch,General,"lunch,dinner",800,38,68,34,weight_gain,high-protein,savory,short,medium
+Eba and Okra with Beef,lunch,General,"lunch,dinner",560,28,64,18,weight_gain,high-protein,savory,short,medium
+Eba and Okra with Fish,lunch,General,"lunch,dinner",540,26,64,16,weight_gain,high-protein,savory,short,medium
+Eba and Efo Riro with Beef,lunch,General,"lunch,dinner",620,30,66,22,weight_gain,high-protein,savory,short,medium
+Eba and Efo Riro with Chicken,lunch,General,"lunch,dinner",600,30,66,20,weight_gain,high-protein,savory,short,medium
+Eba and Afang with Periwinkle,lunch,South-South,"lunch,dinner",660,34,65,28,weight_gain,high-protein,savory,medium,medium
+Eba and Ogbono with Beef,lunch,General,"lunch,dinner",740,34,68,34,weight_gain,high-protein,savory,medium,medium
+Eba and Bitterleaf with Beef,lunch,General,"lunch,dinner",570,28,64,20,weight_gain,high-protein,bitter-savory,medium,medium
+Eba and Oha with Beef,lunch,Southeast/Igbo,"lunch,dinner",600,30,64,22,weight_gain,high-protein,savory,medium,medium
+Eba and Edikaikong with Beef,lunch,South-South,"lunch,dinner",650,34,64,26,weight_gain,high-protein,savory,medium,medium
+Pounded Yam and Egusi with Chicken,lunch,General,"lunch,dinner",910,40,78,40,weight_gain,high-protein,savory,long,high
+Pounded Yam and Egusi with Fish,lunch,General,"lunch,dinner",880,38,78,38,weight_gain,high-protein,savory,long,high
+Pounded Yam and Efo Riro with Beef,lunch,Yoruba/Southwest,"lunch,dinner",740,32,75,26,weight_gain,high-protein,savory,long,high
+Pounded Yam and Oha with Beef,lunch,Southeast/Igbo,"lunch,dinner",760,34,74,28,weight_gain,high-protein,savory,long,high
+Pounded Yam and Afang with Periwinkle,lunch,South-South,"lunch,dinner",800,38,74,32,weight_gain,high-protein,savory,long,high
+Pounded Yam and Okra with Fish,lunch,General,"lunch,dinner",690,30,74,22,weight_gain,high-protein,savory,long,medium
+Fufu and Egusi with Beef,lunch,Southeast/Igbo,"lunch,dinner",760,38,70,38,weight_gain,high-protein,savory,long,medium
+Fufu and Egusi with Fish,lunch,Southeast/Igbo,"lunch,dinner",740,36,70,36,weight_gain,high-protein,savory,long,medium
+Fufu and Oha with Beef,lunch,Southeast/Igbo,"lunch,dinner",590,30,66,22,weight_gain,high-protein,savory,long,medium
+Fufu and Afang with Periwinkle,lunch,South-South,"lunch,dinner",650,34,66,28,weight_gain,high-protein,savory,long,medium
+Fufu and Okra with Stockfish,lunch,Southeast/Igbo,"lunch,dinner",510,26,66,18,maintenance,high-protein,savory,long,medium
+Fufu and Bitterleaf with Beef,lunch,Southeast/Igbo,"lunch,dinner",530,28,66,20,maintenance,high-protein,bitter-savory,long,medium
+Semo and Egusi with Beef,lunch,General,"lunch,dinner",800,38,72,38,weight_gain,high-protein,savory,short,medium
+Semo and Okra with Fish,lunch,General,"lunch,dinner",540,28,68,18,weight_gain,high-protein,savory,short,medium
+Semo and Efo Riro with Chicken,lunch,General,"lunch,dinner",590,30,68,22,weight_gain,high-protein,savory,short,medium
+Semo and Afang with Periwinkle,lunch,South-South,"lunch,dinner",640,32,68,28,weight_gain,high-protein,savory,short,medium
+Semo and Oha with Beef,lunch,Southeast/Igbo,"lunch,dinner",570,30,68,22,weight_gain,high-protein,savory,short,medium
+Semo and Ogbono with Beef,lunch,General,"lunch,dinner",720,34,70,32,weight_gain,high-protein,savory,short,medium
+Tuwo Shinkafa and Miyan Yakuwa,lunch,Hausa/North,"lunch,dinner",470,20,66,14,maintenance,balanced,savory,medium,low
+Tuwo Shinkafa and Miyan Karkashi,lunch,Hausa/North,"lunch,dinner",480,22,66,14,maintenance,balanced,savory,medium,low
+Masa,breakfast,Hausa/North,"breakfast,snack",280,8,48,8,maintenance,vegetarian,mild-sweet,medium,low
+Masa and Miyan Kuka,breakfast,Hausa/North,"breakfast,lunch",420,18,62,14,maintenance,balanced,savory,medium,low
+Gwate (Millet Porridge),breakfast,Hausa/North,"breakfast,dinner",260,8,48,6,weight_loss,low-calorie,mild,medium,low
+Fura da Nono,breakfast,Hausa/North,"breakfast,snack",220,10,34,6,weight_loss,high-protein,sour-sweet,short,low
+Dambu Nama (Shredded Beef),snack,Hausa/North,"snack,lunch,dinner",310,32,8,16,weight_loss,high-protein,spicy-savory,long,medium
+Waina (Rice Cake),breakfast,Hausa/North,"breakfast,snack",260,6,46,8,maintenance,vegetarian,mild-sweet,medium,low
+Ofe Akwu and Rice,lunch,Southeast/Igbo,"lunch,dinner",680,24,86,26,maintenance,energy-rich,savory,long,medium
+Ofe Nsala (White Soup) and Fufu,lunch,Southeast/Igbo,"lunch,dinner",620,30,66,22,weight_gain,high-protein,spicy,long,medium
+Ofe Nsala and Pounded Yam,lunch,Southeast/Igbo,"lunch,dinner",780,34,78,28,weight_gain,high-protein,spicy,long,high
+Ofe Owerri and Eba,lunch,Southeast/Igbo,"lunch,dinner",590,28,64,22,maintenance,high-protein,savory,long,medium
+Abacha and Ugba,snack,Southeast/Igbo,"lunch,snack",400,16,52,16,maintenance,balanced,sour-savory,medium,medium
+Nkwobi,snack,Southeast/Igbo,"dinner,snack",380,28,10,26,weight_loss,high-protein,spicy,long,high
+Isi Ewu (Goat Head),snack,Southeast/Igbo,"dinner,snack",420,30,12,28,maintenance,high-protein,spicy,long,high
+Ofe Onugbu and Pounded Yam,lunch,Southeast/Igbo,"lunch,dinner",760,32,76,28,maintenance,energy-rich,bitter-savory,long,medium
+Edikaikong Soup and Eba,lunch,South-South,"lunch,dinner",620,30,64,24,weight_gain,high-protein,savory,medium,medium
+Banga Soup and Starch,lunch,South-South,"lunch,dinner",680,28,82,28,weight_gain,energy-rich,savory,long,medium
+Ofe Akwu (Palm Nut Soup) and Eba,lunch,South-South,"lunch,dinner",660,26,66,28,maintenance,energy-rich,savory,long,medium
+Pepper Soup and Agidi,dinner,South-South,"dinner,snack",290,28,22,10,weight_loss,high-protein,spicy,medium,medium
+Snail Pepper Soup,dinner,South-South,"dinner,snack",200,26,6,8,weight_loss,high-protein,spicy,long,high
+Afang Soup and Garri,lunch,South-South,"lunch,dinner",640,32,65,26,weight_gain,high-protein,savory,medium,medium
+Efo Elegusi,lunch,Yoruba/Southwest,"lunch,dinner",480,24,18,36,weight_gain,high-protein,savory,long,medium
+"Abula (Amala, Ewedu, Gbegiri, Stew)",lunch,Yoruba/Southwest,"lunch,dinner",510,28,58,18,weight_gain,high-protein,savory,medium,medium
+Adalu (Beans and Corn),lunch,Yoruba/Southwest,"lunch,dinner",420,18,70,10,maintenance,vegetarian,savory,long,low
+Efo and Eba,lunch,Yoruba/Southwest,"lunch,dinner",560,26,66,20,maintenance,balanced,savory,short,low
+Agidi and Moin Moin,breakfast,Yoruba/Southwest,"breakfast,lunch",310,18,46,8,weight_loss,high-protein,mild,medium,low
+Agidi Jollof,breakfast,Yoruba/Southwest,"breakfast,lunch",280,6,52,6,weight_loss,low-calorie,savory,medium,low
+Ogi and Akara,breakfast,Yoruba/Southwest,breakfast,340,16,46,12,weight_loss,high-protein,savory,medium,low
+White Rice and Banga Soup,lunch,South-South,"lunch,dinner",710,26,90,26,maintenance,energy-rich,savory,long,medium
+White Rice and Afang Soup,lunch,South-South,"lunch,dinner",680,28,84,22,maintenance,high-protein,savory,medium,medium
+White Rice and Efo Riro,lunch,Yoruba/Southwest,"lunch,dinner",620,24,82,20,maintenance,balanced,savory,medium,medium
+Jollof Rice and Plantain and Chicken,lunch,General,"lunch,dinner",780,36,96,24,weight_gain,high-protein,savory-spicy,medium,high
+Jollof Rice and Turkey,lunch,General,"lunch,dinner",680,36,78,22,weight_gain,high-protein,savory-spicy,medium,high
+Fried Rice and Moi Moi,lunch,General,"lunch,dinner",640,28,84,22,maintenance,high-protein,savory,medium,medium
+Rice and Dodo,lunch,General,"breakfast,lunch,dinner",620,16,108,16,maintenance,energy-rich,sweet-savory,medium,low
+Ofada Rice and Stew,lunch,Yoruba/Southwest,"lunch,dinner",660,24,82,24,maintenance,balanced,spicy,medium,medium
+Yam and Beans Stew,breakfast,General,"breakfast,lunch,dinner",490,20,78,12,maintenance,high-protein,savory,medium,low
+Yam and Corned Beef Sauce,breakfast,General,"breakfast,lunch",520,22,72,16,maintenance,balanced,savory,medium,low
+Pottage Yam with Stockfish,lunch,General,"lunch,dinner",510,20,78,14,maintenance,high-protein,savory,medium,low
+Dundun (Fried Yam) and Egg,breakfast,Yoruba/Southwest,"breakfast,lunch,snack",560,20,74,22,maintenance,balanced,savory,medium,low
+Dundun and Gbegiri,breakfast,Yoruba/Southwest,"breakfast,lunch",560,24,76,20,maintenance,balanced,savory,medium,low
+Plantain Mosa,snack,Yoruba/Southwest,"breakfast,snack",240,4,42,8,maintenance,vegetarian,sweet,medium,low
+Plantain and Egg Stew,breakfast,General,"breakfast,lunch,dinner",540,16,74,22,maintenance,balanced,savory,short,low
+Boiled Plantain and Fish Stew,lunch,General,"lunch,dinner",490,28,64,14,weight_gain,high-protein,savory,medium,medium
+Boiled Plantain and Vegetable Sauce,lunch,General,"lunch,dinner",420,12,72,12,weight_loss,vegetarian,savory,medium,low
+Plantain and Egg and Tomato Stew,breakfast,General,"breakfast,lunch,dinner",560,18,74,22,maintenance,balanced,savory,short,low
+Bread and Fried Fish,breakfast,General,"breakfast,lunch,dinner",480,26,52,18,maintenance,high-protein,savory,short,medium
+Bread and Beans,breakfast,General,"breakfast,lunch,dinner",450,18,72,12,maintenance,high-protein,savory,medium,low
+Bread and Avocado,breakfast,General,"breakfast,lunch",380,8,48,18,weight_loss,balanced,mild,short,medium
+Tea and Biscuits,breakfast,General,"breakfast,snack",240,4,40,8,weight_loss,low-calorie,sweet,short,low
+Tea and Egg and Bread,breakfast,General,"breakfast,dinner",450,18,56,16,maintenance,balanced,mild,short,low
+Milo and Bread,breakfast,General,"breakfast,snack",360,10,60,10,maintenance,low-calorie,sweet,short,low
+Ovaltine and Bread,breakfast,General,"breakfast,snack",340,10,58,8,maintenance,low-calorie,sweet,short,low
+Indomie with Egg and Vegetables,snack,General,"breakfast,lunch,dinner,snack",490,20,60,20,maintenance,balanced,savory-spicy,short,low
+Spaghetti and Meatballs,dinner,General,"lunch,dinner",650,32,78,22,weight_gain,high-protein,savory,medium,medium
+Pasta and Chicken Stew,dinner,General,"lunch,dinner",620,32,76,18,weight_gain,high-protein,savory,medium,medium
+Macaroni and Egg,dinner,General,"lunch,dinner",540,22,74,16,maintenance,balanced,savory,medium,low
+Corn Porridge,breakfast,General,"breakfast,dinner",280,8,52,6,weight_loss,vegetarian,mild,medium,low
+Millet Porridge,breakfast,Hausa/North,"breakfast,dinner",260,8,48,6,weight_loss,low-calorie,mild,medium,low
+Semolina Pudding,breakfast,General,"breakfast,dinner",300,8,54,6,weight_loss,low-calorie,mild-sweet,short,low
+Plantain Flour Porridge,breakfast,General,"breakfast,dinner",310,6,58,6,weight_loss,vegetarian,mild,medium,low
+Egg and Tomato Sauce,snack,General,"breakfast,snack,dinner",200,14,8,14,weight_loss,high-protein,savory,short,low
+Peppered Gizzard,snack,General,"snack,dinner",250,28,10,12,weight_loss,high-protein,spicy,medium,medium
+Peppered Snail,snack,General,"snack,dinner",220,24,10,10,weight_loss,high-protein,spicy,long,high
+Asun (Peppered Goat Meat),snack,Yoruba/Southwest,"snack,dinner",300,28,8,18,weight_loss,high-protein,spicy,long,high
+Peppered Chicken,snack,General,"snack,dinner",290,32,8,16,weight_loss,high-protein,spicy,medium,high
+Fried Chicken,snack,General,"lunch,dinner,snack",380,30,16,22,maintenance,high-protein,savory,medium,high
+Barbecue Chicken,snack,General,"lunch,dinner,snack",340,34,6,18,weight_loss,high-protein,smoky-spicy,long,high
+Peppered Turkey,snack,General,"snack,dinner",310,34,8,16,weight_loss,high-protein,spicy,medium,high
+Kilishi and Kunu,snack,Hausa/North,snack,410,32,32,14,maintenance,high-protein,spicy-sweet,long,medium
+Zobo and Chin Chin,snack,General,snack,260,4,44,8,maintenance,indulgent,sweet-sour,medium,low
+Kunu and Kulikuli,snack,Hausa/North,"breakfast,snack",310,12,32,14,maintenance,balanced,savory-sweet,long,low
+Pap (Akamu) with Milk and Sugar,breakfast,General,"breakfast,dinner",260,6,50,6,weight_loss,low-calorie,sweet,short,low
+Scrambled Eggs,breakfast,General,"breakfast,dinner",200,14,2,14,weight_loss,high-protein,savory,short,low
+Omelette with Vegetables,breakfast,General,"breakfast,lunch,dinner",240,16,6,16,weight_loss,high-protein,savory,short,low
+Egg and Potato Sauce,breakfast,General,"breakfast,lunch",380,16,46,16,maintenance,balanced,savory,medium,low
+Egg Stew and Rice,lunch,General,"breakfast,lunch,dinner",520,20,74,16,maintenance,high-protein,savory,medium,low
+Coconut Rice and Fish,lunch,South-South,"lunch,dinner",660,28,84,24,maintenance,high-protein,mild-sweet,medium,medium
+Coconut Rice and Shrimp,lunch,South-South,"lunch,dinner",640,30,84,22,weight_gain,high-protein,mild-sweet,medium,high
+White Rice and Fried Chicken,lunch,General,"lunch,dinner",680,32,80,24,weight_gain,high-protein,savory,medium,medium
+White Rice and Grilled Fish,lunch,General,"lunch,dinner",580,30,80,14,weight_gain,high-protein,savory,medium,medium
+White Rice and Beef Stew,lunch,General,"breakfast,lunch,dinner",620,30,80,18,weight_gain,high-protein,savory,medium,medium
+Jollof Rice and Grilled Fish,lunch,General,"lunch,dinner",600,30,78,18,weight_gain,high-protein,savory-spicy,medium,medium
+Jollof Rice and Fried Plantain,lunch,General,"lunch,dinner",680,14,112,18,maintenance,energy-rich,sweet-savory,medium,medium
+Fried Rice and Fish,lunch,General,"lunch,dinner",630,32,72,22,weight_gain,high-protein,savory,medium,medium
+Fried Rice and Beef,lunch,General,"lunch,dinner",660,34,72,24,weight_gain,high-protein,savory,medium,medium
+Rice and Vegetable Stir Fry,lunch,General,"lunch,dinner",480,14,82,12,weight_loss,vegetarian,savory,medium,low
+Eba and Okra with Periwinkle,lunch,South-South,"lunch,dinner",550,26,64,18,weight_gain,high-protein,savory,short,medium
+Eba and Ogbono with Chicken,lunch,General,"lunch,dinner",730,34,68,32,weight_gain,high-protein,savory,medium,medium
+Pounded Yam and Nsala Soup,lunch,Southeast/Igbo,"lunch,dinner",760,34,78,26,weight_gain,high-protein,spicy,long,medium
+Amala and Nsala Soup,lunch,Yoruba/Southwest,"lunch,dinner",520,28,58,16,maintenance,high-protein,spicy,medium,medium
+Fufu and Nsala Soup,lunch,Southeast/Igbo,"lunch,dinner",580,28,66,20,maintenance,high-protein,spicy,long,medium
+Semo and Nsala Soup,lunch,General,"lunch,dinner",560,28,68,18,maintenance,high-protein,spicy,short,medium
+Wheat Swallow and Afang Soup,lunch,South-South,"lunch,dinner",560,30,62,22,weight_loss,high-protein,savory,medium,medium
+Wheat Swallow and Egusi with Beef,lunch,General,"lunch,dinner",720,36,64,32,weight_gain,high-protein,savory,medium,medium
+Wheat Swallow and Ewedu,lunch,Yoruba/Southwest,"lunch,dinner",430,22,58,14,weight_loss,balanced,savory,medium,low
+Wheat Swallow and Ogbono,lunch,General,"lunch,dinner",610,28,64,26,maintenance,balanced,savory,medium,low
+Akara and Tea,breakfast,General,breakfast,320,14,42,12,weight_loss,high-protein,savory-sweet,medium,low
+Moi Moi and Ogi,breakfast,General,"breakfast,dinner",330,18,48,10,weight_loss,high-protein,mild,long,low
+Ogi and Akara with Egg,breakfast,Yoruba/Southwest,breakfast,380,20,48,14,weight_loss,high-protein,savory,medium,low
+Custard with Banana,breakfast,General,"breakfast,dinner",310,8,58,6,weight_loss,low-calorie,sweet,short,low
+Oat and Egg Breakfast Bowl,breakfast,General,breakfast,420,20,56,14,weight_gain,high-protein,mild-savory,short,low
+Cereal with Banana and Milk,breakfast,General,breakfast,340,8,62,8,weight_loss,low-calorie,sweet,short,medium
+Bread and Peanut Butter,breakfast,General,"breakfast,lunch,snack",400,12,50,18,maintenance,balanced,sweet-savory,short,low
+Bread and Jam,breakfast,General,"breakfast,snack",310,6,58,8,maintenance,low-calorie,sweet,short,low
+Akara and Ogi with Milk,breakfast,General,breakfast,360,16,50,12,weight_loss,high-protein,savory-sweet,medium,low
+Yam Pepper Soup,dinner,General,"lunch,dinner",420,16,74,10,weight_loss,balanced,spicy,medium,medium
+Plantain Pepper Soup,dinner,General,dinner,360,14,66,8,weight_loss,balanced,spicy,medium,medium
+Ofe Akwu and Fufu,lunch,Southeast/Igbo,"lunch,dinner",670,26,70,28,maintenance,energy-rich,savory,long,medium
+Egusi Soup and Pounded Yam,lunch,General,"lunch,dinner",870,36,78,38,weight_gain,energy-rich,savory,long,high
+Light Soup and Rice,dinner,General,"lunch,dinner",540,26,80,14,weight_loss,high-protein,spicy,medium,medium
+Vegetable Soup and Eba,lunch,General,"lunch,dinner",560,26,64,20,maintenance,balanced,savory,short,low
+Buns,snack,General,"breakfast,snack",280,6,40,12,maintenance,indulgent,sweet,medium,low
+Coconut Candy,snack,General,snack,140,1,24,6,maintenance,indulgent,sweet,long,low
+Roasted Corn,snack,General,snack,130,4,26,2,weight_loss,low-calorie,savory,medium,low
+Roasted Corn and Pear (Ube),snack,Southeast/Igbo,snack,280,6,32,14,maintenance,balanced,savory-mild,medium,low
+Boiled Groundnuts,snack,General,snack,160,8,8,12,weight_loss,high-protein,savory,medium,low
+Fried Fish (Panla),snack,General,"lunch,snack,dinner",220,28,6,10,weight_loss,high-protein,savory,medium,medium
+Fried Shrimp,snack,General,"lunch,snack,dinner",200,24,6,10,weight_loss,high-protein,savory-spicy,short,high
+Peppered Fish,snack,General,"lunch,snack,dinner",240,28,8,12,weight_loss,high-protein,spicy,medium,medium
+Suya and Bread,snack,Hausa/North,"lunch,dinner,snack",460,30,40,18,maintenance,high-protein,spicy-smoky,medium,medium
+Shawarma Mini,snack,General,snack,380,22,42,16,maintenance,balanced,savory-spicy,medium,medium
+Spring Roll,snack,General,"snack,lunch",320,10,36,16,maintenance,balanced,savory,medium,medium
+Samosa,snack,General,"breakfast,snack",300,8,34,16,maintenance,balanced,savory-spicy,medium,medium
+Peppersoup Chicken Wings,snack,General,"snack,dinner",310,30,10,18,weight_loss,high-protein,spicy,medium,high

@@ -10,7 +10,7 @@ dj-database-url==3.1.2
 Django==6.0.6
 django-cloudinary-storage==0.3.0
 duckduckgo_search==8.1.1
-flatbuffers==25.12.19
+# flatbuffers==25.12.19
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.81.1
@@ -18,8 +18,8 @@ gunicorn==26.0.0
 h5py==3.14.0
 idna==3.18
 joblib==1.5.3
-keras==3.15.0
-libclang==18.1.1
+# keras==3.15.0
+# libclang==18.1.1
 lightgbm==4.6.0
 lxml==6.1.1
 markdown-it-py==4.2.0
@@ -45,7 +45,7 @@ scipy==1.18.0
 setuptools==82.0.1
 six==1.17.0
 sqlparse==0.5.5
-tensorflow==2.21.0
+# tensorflow==2.21.0
 termcolor==3.3.0
 threadpoolctl==3.6.0
 typing_extensions==4.15.0

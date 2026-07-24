@@ -44,11 +44,11 @@ recommender/ml/random_forest.pkl
 # !encoders/
 
 # ── Dataset files ─────────────────────────────────────────
-*.csv
-*.xlsx
-mynaijadiet_processed.csv
-mynaijadiet_dataset_v2.csv
-meal_id_map.csv
+# *.csv
+# *.xlsx
+# mynaijadiet_processed.csv
+# mynaijadiet_dataset_v2.csv
+# meal_id_map.csv
 
 # ── Environment variables ─────────────────────────────────
 .env

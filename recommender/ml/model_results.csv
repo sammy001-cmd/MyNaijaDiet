@@ -1,0 +1,6 @@
+model,test_accuracy,cv_accuracy
+Random Forest,0.88,0.8195
+LightGBM,0.88,0.8304
+ANN,0.8667,
+LSTM,0.64,
+Ensemble (avg),0.8667,
