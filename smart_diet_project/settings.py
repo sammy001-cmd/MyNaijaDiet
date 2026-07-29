@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "cloudinary_storage",
     "django.contrib.staticfiles",
+    "cloudinary",
     "recommender",
 ]
 
@@ -139,13 +141,26 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Cloudinary Storage for User & Staff Media Uploads
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'yhzhrspr'),
+#     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '511412584589175'),
+#     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'WOKvVza8OyuRidw3jzr6hmaBjz4'),
+# }
+# Cloudinary Storage for User & Staff Media Uploads
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'yhzhrspr'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '511412584589175'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'WOKvVza8OyuRidw3jzr6hmaBjz4'),
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # to stop the tensorflow warning messages
 import os
