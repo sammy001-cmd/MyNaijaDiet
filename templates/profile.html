@@ -3,11 +3,754 @@
 
 {% block extra_head %}
 <style>
+    /* Premium Gradients and Shadows */
+    .bmi-gradient { background: linear-gradient(90deg, #34d399 0%, #fbbf24 50%, #f87171 100%); }
+    .premium-cover { background: linear-gradient(135deg, rgba(27,94,32,0.8) 0%, rgba(56,142,60,0.6) 100%), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center; }
+    
+    /* Smooth Image Upload Hover Overlay */
+    .avatar-upload-group:hover .avatar-overlay { opacity: 1; }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Wrap the entire page in a flex container -->
+<div class="min-h-screen flex bg-surface-container-lowest relative">
+    
+  <!-- Desktop Sidebar (Fixed) -->
+  <aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant/30 bg-surface fixed left-0 top-0 w-64 z-50">
+    <div class="mb-stack-lg flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-md">
+        <span class="material-symbols-outlined text-[18px]">eco</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-lg text-primary font-bold leading-tight">MyNaijaDiet</h1>
+        <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold opacity-70">Premium</p>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-2">
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'dashboard' %}">
+        <span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-md">Dashboard</span>
+      </a>
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'recommendations' %}">
+        <span class="material-symbols-outlined text-[20px]">recommend</span><span class="font-label-md">Recommendations</span>
+      </a>
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'meal_plan' %}">
+        <span class="material-symbols-outlined text-[20px]">restaurant_menu</span><span class="font-label-md">Meal Plan</span>
+      </a>
+      <a class="flex items-center gap-3 bg-primary/10 text-primary rounded-xl px-4 py-3 transition-all shadow-sm border border-primary/10" href="{% url 'profile' %}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-label-md font-bold">Profile Settings</span>
+      </a>
+    </nav>
+    <div class="mt-auto pt-6 border-t border-outline-variant/30">
+      <div class="flex items-center gap-3 px-2">
+        {% if profile.profile_picture %}
+          <img src="{{ profile.profile_picture.url }}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-outline-variant/30">
+        {% else %}
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+            <span class="text-on-primary font-bold text-sm">{{ user_initials }}</span>
+          </div>
+        {% endif %}
+        <div class="overflow-hidden">
+          <p class="font-label-md truncate text-on-surface">{{ user_name }}</p>
+          <a class="text-caption text-error hover:underline flex items-center gap-1 mt-0.5" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[14px]">logout</span> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper (Takes remaining space without overflowing) -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen w-full">
+    
+    <!-- Mobile Header -->
+    <header class="lg:hidden bg-surface/90 backdrop-blur-md shadow-sm sticky top-0 z-40 flex justify-between items-center w-full px-margin-mobile py-4 border-b border-outline-variant/20">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">eco</span>
+        <h1 class="font-headline-md text-lg font-bold text-primary">MyNaijaDiet</h1>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
+        <span class="text-on-primary text-xs font-bold">{{ user_initials }}</span>
+      </div>
+    </header>
+
+    <!-- Form wrapper spans Main & Footer -->
+    <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" class="flex flex-col flex-1 relative">
+      {% csrf_token %}
+
+      <main class="flex-1 px-margin-mobile md:px-8 py-8 w-full max-w-6xl mx-auto pb-32 lg:pb-12">
+        
+        <!-- Premium Cover & Profile Upload Section -->
+        <div class="relative w-full h-48 md:h-64 rounded-3xl premium-cover shadow-lg mb-16 md:mb-20 flex items-end z-20">
+          <div class="absolute -bottom-8 md:-bottom-10 left-6 md:left-10 flex items-end gap-4 md:gap-6 w-full pr-10">
+            
+            <!-- Avatar Upload Circle -->
+            <!-- Inline width/height/aspect-ratio/overflow are a safety net: if a Tailwind
+                 utility class ever gets purged/missed, the avatar still stays a small,
+                 clipped circle instead of rendering at the photo's full natural size. -->
+            <div class="relative group avatar-upload-group cursor-pointer shrink-0 shadow-2xl" role="button" tabindex="0" aria-label="Upload profile picture">
+                <div class="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-surface bg-surface shadow-xl overflow-hidden relative"
+                     style="width:clamp(4rem,9vw,6rem);height:clamp(4rem,9vw,6rem);aspect-ratio:1/1;overflow:hidden;border-radius:9999px;">
+                  {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" id="avatar-preview" class="w-full h-full object-cover object-center" alt="Profile picture"
+                         style="width:100%;height:100%;object-fit:cover;object-position:center;">
+                  {% else %}
+                    <div id="avatar-fallback" class="w-full h-full bg-primary-container flex items-center justify-center">
+                      <span class="text-primary font-headline-lg text-2xl md:text-3xl">{{ user_initials }}</span>
+                    </div>
+                    <img src="" id="avatar-preview" class="w-full h-full object-cover object-center hidden" alt="Profile preview"
+                         style="width:100%;height:100%;object-fit:cover;object-position:center;">
+                  {% endif %}
+
+                  <!-- Hover Overlay for Upload -->
+                  <div class="avatar-overlay absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+                    <span class="material-symbols-outlined text-white text-xl">photo_camera</span>
+                    <span class="text-white text-[9px] uppercase tracking-wider font-bold mt-1">Upload</span>
+                  </div>
+                </div>
+                <!-- Hidden File Input -->
+                <input type="file" name="profile_picture" id="profile_picture_input" accept="image/*" class="hidden" onchange="previewImage(event)">
+              </div>
+
+            <!-- User Info next to Avatar -->
+            <!-- FIX: added flex-1 min-w-0 so this block can actually shrink inside the flex row
+                 instead of forcing the row (and the avatar with it) wider than the cover banner -->
+            <div class="mb-2 md:mb-4 text-white drop-shadow-lg flex-1 min-w-0">
+              <h2 class="font-headline-lg text-2xl md:text-3xl font-bold truncate">{{ user_name }}</h2>
+              <p class="text-sm md:text-base font-body-md opacity-90 truncate">{{ request.user.email }}</p>
+              <div class="inline-flex mt-2 px-3 py-1 bg-white/20 text-white rounded-full text-caption font-bold border border-white/40 capitalize backdrop-blur-sm shadow-sm">
+                {{ profile.get_health_goal_display }}
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        <p class="mt-1 mb-8 text-xs text-on-surface-variant text-center md:text-left md:ml-[136px]">Click the avatar to upload a profile picture (JPG/PNG/WebP).</p>
+
+        <!-- Grid Layout for Stats & Settings -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Left Column: BMI & Stats Card -->
+          <div class="lg:col-span-4 space-y-6">
+            <div class="bg-surface rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/30">
+              <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-4">
+                <h3 class="font-headline-md text-lg text-on-surface">Health Snapshot</h3>
+                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-[11px] font-bold uppercase tracking-wider">{{ bmi_status }}</span>
+              </div>
+              
+              <p class="text-caption text-on-surface-variant uppercase tracking-wider font-bold mb-1">Current BMI</p>
+              <div class="flex items-baseline gap-2 mb-4">
+                <span class="text-5xl font-bold text-primary">{{ profile.bmi }}</span>
+                <span class="text-body-md text-on-surface-variant">kg/m²</span>
+              </div>
+              
+              <div class="w-full h-2 rounded-full bmi-gradient mb-2 relative shadow-inner">
+                <div class="absolute top-[-5px] w-4 h-4 bg-white border-[3px] border-on-surface rounded-full shadow-md transition-all duration-700" style="left: {{ bmi_pct }}%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-on-surface-variant px-1 font-bold">
+                <span>18.5</span><span>25.0</span><span>30.0</span>
+              </div>
+              
+              <div class="mt-8 space-y-4">
+                <div class="flex justify-between items-center bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20">
+                  <div class="flex items-center gap-2 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+                    <span class="text-sm">BMR</span>
+                  </div>
+                  <span class="font-bold text-on-surface">{{ profile.bmr }} kcal</span>
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20">
+                  <div class="flex items-center gap-2 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[18px]">bolt</span>
+                    <span class="text-sm">TDEE</span>
+                  </div>
+                  <span class="font-bold text-on-surface">{{ profile.tdee }} kcal</span>
+                </div>
+                <div class="flex justify-between items-center bg-primary/5 p-3 rounded-xl border border-primary/20">
+                  <div class="flex items-center gap-2 text-primary font-bold">
+                    <span class="material-symbols-outlined text-[18px]">target</span>
+                    <span class="text-sm">Daily Target</span>
+                  </div>
+                  <span class="font-bold text-primary text-lg">{{ calorie_target }} kcal</span>
+                </div>
+              </div>
+              <p class="mt-6 text-caption text-on-surface-variant italic leading-relaxed">{{ bmi_message }}</p>
+            </div>
+          </div>
+
+          <!-- Right Column: Settings Form Inputs -->
+          <div class="lg:col-span-8 bg-surface rounded-3xl p-6 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/30">
+            <div class="space-y-10">
+
+              <!-- Biometrics Section -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">monitor_weight</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Physical Metrics</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Age</label>
+                    <input name="age" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" min="10" max="100" value="{{ profile.age }}">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Gender</label>
+                    <select name="gender" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="M" {% if profile.gender == 'male' %}selected{% endif %}>Male</option>
+                      <option value="F" {% if profile.gender == 'female' %}selected{% endif %}>Female</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Current Weight (kg)</label>
+                    <input name="weight" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" step="0.1" min="20" max="300" value="{{ profile.weight_kg }}">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Height (cm)</label>
+                    <input name="height" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" step="0.1" min="50" max="250" value="{{ profile.height_cm }}">
+                  </div>
+                </div>
+              </section>
+
+              <hr class="border-outline-variant/20">
+
+              <!-- Lifestyle & Goals Section -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">fitness_center</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Lifestyle &amp; Preference</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Activity Level</label>
+                    <select name="activity_level" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="sedentary" {% if profile.activity_level == 'sedentary' %}selected{% endif %}>Sedentary (Little or no exercise)</option>
+                      <option value="light" {% if profile.activity_level == 'light' %}selected{% endif %}>Lightly Active (1-3 days/week)</option>
+                      <option value="moderate" {% if profile.activity_level == 'moderate' %}selected{% endif %}>Moderately Active (3-5 days/week)</option>
+                      <option value="active" {% if profile.activity_level == 'active' %}selected{% endif %}>Active (6-7 days/week)</option>
+                      <option value="very_active"{% if profile.activity_level == 'very_active' %}selected{% endif %}>Very Active (Athlete)</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Primary Goal</label>
+                    <select name="goal" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="maintenance" {% if profile.health_goal == 'maintenance' %}selected{% endif %}>Maintain Weight</option>
+                      <option value="weight_loss" {% if profile.health_goal == 'weight_loss' %}selected{% endif %}>Lose Weight</option>
+                      <option value="weight_gain" {% if profile.health_goal == 'weight_gain' %}selected{% endif %}>Gain Weight</option>
+                    </select>
+                  </div>
+                  
+                  <div class="space-y-3 md:col-span-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Cultural Food Focus</label>
+                    <input type="hidden" name="region" id="region-input" value="{{ current_region }}">
+                    <div class="flex flex-wrap gap-3">
+                      <button type="button" onclick="selectRegion(this, 'general')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'general' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">National</button>
+                      <button type="button" onclick="selectRegion(this, 'yoruba_southwest')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'yoruba_southwest' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Yoruba</button>
+                      <button type="button" onclick="selectRegion(this, 'igbo_southeast')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'igbo_southeast' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Igbo</button>
+                      <button type="button" onclick="selectRegion(this, 'hausa_north')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'hausa_north' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Hausa</button>
+                      <button type="button" onclick="selectRegion(this, 'south_south')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'south_south' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">South-South</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <hr class="border-outline-variant/20">
+
+              <!-- Medical Flags -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">health_and_safety</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Medical &amp; Dietary Flags</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_diabetic" {% if profile.is_diabetic %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Diabetic</span>
+                  </label>
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_hypertensive" {% if profile.is_hypertensive %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Hypertensive</span>
+                  </label>
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_vegetarian" {% if profile.is_vegetarian %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Vegetarian</span>
+                  </label>
+                </div>
+              </section>
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Fixed Footer/Save Action Bar -->
+      <div class="bg-surface border-t border-outline-variant/20 p-4 md:px-8 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] sticky bottom-0 z-40 lg:static lg:mt-auto">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center">
+          <button class="flex-1 md:flex-none px-12 py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-xl hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-2 transform active:scale-95" type="submit">
+              <span class="material-symbols-outlined text-[20px]">save</span>Update Profile
+            </button>
+          <div class="flex gap-4 w-full md:w-auto order-1 md:order-2">
+            {% comment %} <button class="flex-1 md:flex-none px-12 py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-xl hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-2 transform active:scale-95" type="submit">
+              <span class="material-symbols-outlined text-[20px]">save</span>Update Profile
+            </button> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.05)] lg:hidden flex justify-around items-center px-2 py-3 border-t border-outline-variant/20 pb-safe">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'dashboard' %}">
+    <span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-[10px] font-bold mt-1">Dash</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'recommendations' %}">
+    <span class="material-symbols-outlined text-[22px]">recommend</span><span class="text-[10px] font-bold mt-1">Recs</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'meal_plan' %}">
+    <span class="material-symbols-outlined text-[22px]">restaurant_menu</span><span class="text-[10px] font-bold mt-1">Plan</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-primary p-2" href="{% url 'profile' %}">
+    <span class="material-symbols-outlined text-[22px] bg-primary/10 rounded-full px-4 py-1" style="font-variation-settings: 'FILL' 1;">person</span>
+    <span class="text-[10px] font-bold mt-1">Profile</span>
+  </a>
+</nav>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Region Selector Logic
+function selectRegion(btn, value) {
+    document.getElementById('region-input').value = value;
+    document.querySelectorAll('.region-btn').forEach(b => {
+        b.classList.remove('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+        b.classList.add('border-outline-variant/30', 'text-on-surface-variant');
+    });
+    btn.classList.add('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+    btn.classList.remove('border-outline-variant/30', 'text-on-surface-variant');
+}
+
+// Avatar Image Preview Logic
+const avatarGroup = document.querySelector('.avatar-upload-group');
+const fileInput = document.getElementById('profile_picture_input');
+const preview = document.getElementById('avatar-preview');
+const fallback = document.getElementById('avatar-fallback');
+
+if (avatarGroup && fileInput) {
+    avatarGroup.addEventListener('click', () => fileInput.click());
+    avatarGroup.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            fileInput.click();
+        }
+    });
+}
+
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file && preview) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            if (fallback) fallback.classList.add('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+{% endblock %}
+
+{% comment %} {% extends "base.html" %}
+{% block title %}Profile Settings | MyNaijaDiet{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Premium Gradients and Shadows */
+    .bmi-gradient { background: linear-gradient(90deg, #34d399 0%, #fbbf24 50%, #f87171 100%); }
+    .premium-cover { background: linear-gradient(135deg, rgba(27,94,32,0.8) 0%, rgba(56,142,60,0.6) 100%), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2000&auto=format&fit=crop'); background-size: cover; background-position: center; }
+    
+    /* Smooth Image Upload Hover Overlay */
+    .avatar-upload-group:hover .avatar-overlay { opacity: 1; }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Fix: We wrap the entire page in a flex container to prevent overflow -->
+<div class="min-h-screen flex bg-surface-container-lowest overflow-hidden relative">
+    
+  <!-- Desktop Sidebar (Fixed) -->
+  <aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant/30 bg-surface fixed left-0 top-0 w-64 z-50">
+    <div class="mb-stack-lg flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-md">
+        <span class="material-symbols-outlined text-[18px]">eco</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-lg text-primary font-bold leading-tight">MyNaijaDiet</h1>
+        <p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold opacity-70">Premium</p>
+      </div>
+    </div>
+    <nav class="flex-1 space-y-2">
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'dashboard' %}">
+        <span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-label-md">Dashboard</span>
+      </a>
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'recommendations' %}">
+        <span class="material-symbols-outlined text-[20px]">recommend</span><span class="font-label-md">Recommendations</span>
+      </a>
+      <a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-xl px-4 py-3 transition-all" href="{% url 'meal_plan' %}">
+        <span class="material-symbols-outlined text-[20px]">restaurant_menu</span><span class="font-label-md">Meal Plan</span>
+      </a>
+      <a class="flex items-center gap-3 bg-primary/10 text-primary rounded-xl px-4 py-3 transition-all shadow-sm border border-primary/10" href="{% url 'profile' %}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-label-md font-bold">Profile Settings</span>
+      </a>
+    </nav>
+    <div class="mt-auto pt-6 border-t border-outline-variant/30">
+      <div class="flex items-center gap-3 px-2">
+        {% if profile.profile_picture %}
+          <img src="{{ profile.profile_picture.url }}" class="w-10 h-10 rounded-full object-cover shadow-sm border border-outline-variant/30">
+        {% else %}
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-sm">
+            <span class="text-on-primary font-bold text-sm">{{ user_initials }}</span>
+          </div>
+        {% endif %}
+        <div class="overflow-hidden">
+          <p class="font-label-md truncate text-on-surface">{{ user_name }}</p>
+          <a class="text-caption text-error hover:underline flex items-center gap-1 mt-0.5" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[14px]">logout</span> Logout
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper (Takes remaining space without overflowing) -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen w-full">
+    
+    <!-- Mobile Header -->
+    <header class="lg:hidden bg-surface/90 backdrop-blur-md shadow-sm sticky top-0 z-40 flex justify-between items-center w-full px-margin-mobile py-4 border-b border-outline-variant/20">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">eco</span>
+        <h1 class="font-headline-md text-lg font-bold text-primary">MyNaijaDiet</h1>
+      </div>
+      <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm">
+        <span class="text-on-primary text-xs font-bold">{{ user_initials }}</span>
+      </div>
+    </header>
+
+    <!-- Form wrapper spans Main & Footer -->
+    <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" class="flex flex-col flex-1 relative">
+      {% csrf_token %}
+
+      <main class="flex-1 px-margin-mobile md:px-8 py-8 w-full max-w-6xl mx-auto pb-32 lg:pb-12">
+        
+        <!-- Premium Cover & Profile Upload Section -->
+        <!-- FIX: Added z-20 here so the banner and avatar sit ON TOP of the cards below -->
+        <div class="relative w-full h-48 md:h-64 rounded-3xl premium-cover shadow-lg mb-20 md:mb-24 flex items-end z-20">
+          <div class="absolute -bottom-12 md:-bottom-16 left-6 md:left-10 flex items-end gap-4 md:gap-6 w-full pr-10">
+            
+            <!-- Avatar Upload Circle -->
+<div class="relative group avatar-upload-group cursor-pointer shrink-0 shadow-2xl" role="button" tabindex="0" aria-label="Upload profile picture">
+                <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-surface bg-surface shadow-xl overflow-hidden relative">
+                  {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" id="avatar-preview" class="w-full h-full object-cover" alt="Profile picture">
+                  {% else %}
+                    <div id="avatar-fallback" class="w-full h-full bg-primary-container flex items-center justify-center">
+                      <span class="text-primary font-headline-lg text-4xl md:text-5xl">{{ user_initials }}</span>
+                    </div>
+                    <img src="" id="avatar-preview" class="w-full h-full object-cover hidden" alt="Profile preview">
+                  {% endif %}
+
+                  <!-- Hover Overlay for Upload -->
+                  <div class="avatar-overlay absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+                    <span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
+                    <span class="text-white text-[10px] uppercase tracking-wider font-bold mt-1">Upload Photo</span>
+                  </div>
+                </div>
+                <!-- Hidden File Input -->
+                <input type="file" name="profile_picture" id="profile_picture_input" accept="image/*" class="hidden" onchange="previewImage(event)">
+              </div>
+              <p class="mt-2 text-xs text-on-surface-variant">Click the avatar to upload a profile picture (JPG/PNG/WebP).</p>
+
+            <!-- User Info next to Avatar -->
+            <div class="mb-2 md:mb-4 text-white drop-shadow-lg truncate">
+              <h2 class="font-headline-lg text-2xl md:text-3xl font-bold truncate">{{ user_name }}</h2>
+              <p class="text-sm md:text-base font-body-md opacity-90 truncate">{{ request.user.email }}</p>
+              <div class="inline-flex mt-2 px-3 py-1 bg-white/20 text-white rounded-full text-caption font-bold border border-white/40 capitalize backdrop-blur-sm shadow-sm">
+                {{ profile.health_goal|cut:"_" }} Goal
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Grid Layout for Stats & Settings -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Left Column: BMI & Stats Card -->
+          <div class="lg:col-span-4 space-y-6">
+            <div class="bg-surface rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/30">
+              <div class="flex justify-between items-center mb-6 border-b border-outline-variant/30 pb-4">
+                <h3 class="font-headline-md text-lg text-on-surface">Health Snapshot</h3>
+                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-[11px] font-bold uppercase tracking-wider">{{ bmi_status }}</span>
+              </div>
+              
+              <p class="text-caption text-on-surface-variant uppercase tracking-wider font-bold mb-1">Current BMI</p>
+              <div class="flex items-baseline gap-2 mb-4">
+                <span class="text-5xl font-bold text-primary">{{ profile.bmi }}</span>
+                <span class="text-body-md text-on-surface-variant">kg/m²</span>
+              </div>
+              
+              <div class="w-full h-2 rounded-full bmi-gradient mb-2 relative shadow-inner">
+                <div class="absolute top-[-5px] w-4 h-4 bg-white border-[3px] border-on-surface rounded-full shadow-md transition-all duration-700" style="left: {{ bmi_pct }}%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-on-surface-variant px-1 font-bold">
+                <span>18.5</span><span>25.0</span><span>30.0</span>
+              </div>
+              
+              <div class="mt-8 space-y-4">
+                <div class="flex justify-between items-center bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20">
+                  <div class="flex items-center gap-2 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[18px]">local_fire_department</span>
+                    <span class="text-sm">BMR</span>
+                  </div>
+                  <span class="font-bold text-on-surface">{{ profile.bmr }} kcal</span>
+                </div>
+                <div class="flex justify-between items-center bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20">
+                  <div class="flex items-center gap-2 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[18px]">bolt</span>
+                    <span class="text-sm">TDEE</span>
+                  </div>
+                  <span class="font-bold text-on-surface">{{ profile.tdee }} kcal</span>
+                </div>
+                <div class="flex justify-between items-center bg-primary/5 p-3 rounded-xl border border-primary/20">
+                  <div class="flex items-center gap-2 text-primary font-bold">
+                    <span class="material-symbols-outlined text-[18px]">target</span>
+                    <span class="text-sm">Daily Target</span>
+                  </div>
+                  <span class="font-bold text-primary text-lg">{{ calorie_target }} kcal</span>
+                </div>
+              </div>
+              <p class="mt-6 text-caption text-on-surface-variant italic leading-relaxed">{{ bmi_message }}</p>
+            </div>
+          </div>
+
+          <!-- Right Column: Settings Form Inputs -->
+          <div class="lg:col-span-8 bg-surface rounded-3xl p-6 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/30">
+            <div class="space-y-10">
+
+              <!-- Biometrics Section -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">monitor_weight</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Physical Metrics</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Age</label>
+                    <input name="age" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" min="10" max="100" value="{{ profile.age }}">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Gender</label>
+                    <select name="gender" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="M" {% if profile.gender == 'male' %}selected{% endif %}>Male</option>
+                      <option value="F" {% if profile.gender == 'female' %}selected{% endif %}>Female</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Current Weight (kg)</label>
+                    <input name="weight" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" step="0.1" min="20" max="300" value="{{ profile.weight_kg }}">
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Height (cm)</label>
+                    <input name="height" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg" type="number" step="0.1" min="50" max="250" value="{{ profile.height_cm }}">
+                  </div>
+                </div>
+              </section>
+
+              <hr class="border-outline-variant/20">
+
+              <!-- Lifestyle & Goals Section -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">fitness_center</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Lifestyle &amp; Preference</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Activity Level</label>
+                    <select name="activity_level" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="sedentary" {% if profile.activity_level == 'sedentary' %}selected{% endif %}>Sedentary (Little or no exercise)</option>
+                      <option value="light" {% if profile.activity_level == 'light' %}selected{% endif %}>Lightly Active (1-3 days/week)</option>
+                      <option value="moderate" {% if profile.activity_level == 'moderate' %}selected{% endif %}>Moderately Active (3-5 days/week)</option>
+                      <option value="active" {% if profile.activity_level == 'active' %}selected{% endif %}>Active (6-7 days/week)</option>
+                      <option value="very_active"{% if profile.activity_level == 'very_active' %}selected{% endif %}>Very Active (Athlete)</option>
+                    </select>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Primary Goal</label>
+                    <select name="goal" class="w-full h-14 px-5 rounded-2xl border-2 border-outline-variant/30 focus:border-primary focus:ring-0 transition-all bg-surface hover:bg-surface-container-lowest font-body-lg appearance-none cursor-pointer">
+                      <option value="maintenance" {% if profile.health_goal == 'maintenance' %}selected{% endif %}>Maintain Weight</option>
+                      <option value="weight_loss" {% if profile.health_goal == 'weight_loss' %}selected{% endif %}>Lose Weight</option>
+                      <option value="weight_gain" {% if profile.health_goal == 'weight_gain' %}selected{% endif %}>Gain Weight</option>
+                    </select>
+                  </div>
+                  
+                  <div class="space-y-3 md:col-span-2">
+                    <label class="font-label-md text-sm text-on-surface-variant font-bold uppercase tracking-wide ml-1">Cultural Food Focus</label>
+                    <input type="hidden" name="region" id="region-input" value="{{ current_region }}">
+                    <div class="flex flex-wrap gap-3">
+                      <button type="button" onclick="selectRegion(this, 'general')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'general' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">National</button>
+                      <button type="button" onclick="selectRegion(this, 'yoruba_southwest')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'yoruba_southwest' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Yoruba</button>
+                      <button type="button" onclick="selectRegion(this, 'igbo_southeast')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'igbo_southeast' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Igbo</button>
+                      <button type="button" onclick="selectRegion(this, 'hausa_north')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'hausa_north' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">Hausa</button>
+                      <button type="button" onclick="selectRegion(this, 'south_south')" class="region-btn px-6 py-3 rounded-full border-2 transition-all font-bold text-sm {% if profile.regional_preference == 'south_south' %}border-primary bg-primary text-white shadow-md{% else %}border-outline-variant/30 text-on-surface-variant hover:border-primary/50{% endif %}">South-South</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <hr class="border-outline-variant/20">
+
+              <!-- Medical Flags -->
+              <section>
+                <div class="flex items-center gap-3 mb-6">
+                  <div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center">
+                    <span class="material-symbols-outlined">health_and_safety</span>
+                  </div>
+                  <h3 class="font-headline-md text-xl text-on-surface">Medical &amp; Dietary Flags</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_diabetic" {% if profile.is_diabetic %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Diabetic</span>
+                  </label>
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_hypertensive" {% if profile.is_hypertensive %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Hypertensive</span>
+                  </label>
+                  <label class="flex items-center gap-4 p-5 rounded-2xl border-2 border-outline-variant/30 bg-surface cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                    <input type="checkbox" name="is_vegetarian" {% if profile.is_vegetarian %}checked{% endif %} class="w-5 h-5 rounded text-primary focus:ring-primary border-outline-variant cursor-pointer">
+                    <span class="font-bold text-on-surface group-hover:text-primary transition-colors">Vegetarian</span>
+                  </label>
+                </div>
+              </section>
+
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Fixed Footer/Save Action Bar -->
+      <div class="bg-surface border-t border-outline-variant/20 p-4 md:px-8 shadow-[0_-4px_20px_rgba(0,0,0,0.02)] sticky bottom-0 z-40 lg:static lg:mt-auto">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center">
+          <a href="{% url 'logout' %}" class="text-error font-bold text-sm px-6 py-3 flex items-center gap-2 hover:bg-error-container/20 rounded-xl transition-all order-2 md:order-1">
+            <span class="material-symbols-outlined text-[18px]">logout</span>Sign Out Securely
+          </a>
+          <div class="flex gap-4 w-full md:w-auto order-1 md:order-2">
+            <button class="flex-1 md:flex-none px-12 py-4 rounded-xl bg-primary text-white font-bold text-sm shadow-lg hover:shadow-xl hover:bg-primary-container hover:text-on-primary-container transition-all flex items-center justify-center gap-2 transform active:scale-95" type="submit">
+              <span class="material-symbols-outlined text-[20px]">save</span>Update Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-8px_30px_rgba(0,0,0,0.05)] lg:hidden flex justify-around items-center px-2 py-3 border-t border-outline-variant/20 pb-safe">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'dashboard' %}">
+    <span class="material-symbols-outlined text-[22px]">dashboard</span><span class="text-[10px] font-bold mt-1">Dash</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'recommendations' %}">
+    <span class="material-symbols-outlined text-[22px]">recommend</span><span class="text-[10px] font-bold mt-1">Recs</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors" href="{% url 'meal_plan' %}">
+    <span class="material-symbols-outlined text-[22px]">restaurant_menu</span><span class="text-[10px] font-bold mt-1">Plan</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-primary p-2" href="{% url 'profile' %}">
+    <span class="material-symbols-outlined text-[22px] bg-primary/10 rounded-full px-4 py-1" style="font-variation-settings: 'FILL' 1;">person</span>
+    <span class="text-[10px] font-bold mt-1">Profile</span>
+  </a>
+</nav>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Region Selector Logic
+function selectRegion(btn, value) {
+    document.getElementById('region-input').value = value;
+    document.querySelectorAll('.region-btn').forEach(b => {
+        b.classList.remove('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+        b.classList.add('border-outline-variant/30', 'text-on-surface-variant');
+    });
+    btn.classList.add('bg-primary', 'text-white', 'border-primary', 'shadow-md');
+    btn.classList.remove('border-outline-variant/30', 'text-on-surface-variant');
+}
+
+// Avatar Image Preview Logic
+const avatarGroup = document.querySelector('.avatar-upload-group');
+const fileInput = document.getElementById('profile_picture_input');
+const preview = document.getElementById('avatar-preview');
+const fallback = document.getElementById('avatar-fallback');
+
+if (avatarGroup && fileInput) {
+    avatarGroup.addEventListener('click', () => fileInput.click());
+    avatarGroup.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            fileInput.click();
+        }
+    });
+}
+
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file && preview) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            if (fallback) fallback.classList.add('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+{% comment %} {% extends "base.html" %}
+{% block title %}Profile Settings | MyNaijaDiet{% endblock %}
+
+{% block extra_head %}
+<style>
     .bmi-gradient { background: linear-gradient(90deg, #34d399 0%, #fbbf24 50%, #f87171 100%); }
 </style>
 {% endblock %}
 
 {% block body %}
+<div class="min-h-screen flex flex-col bg-background">
 <aside class="hidden lg:flex flex-col h-screen p-stack-md border-r border-outline-variant bg-surface-container-low fixed left-0 top-0 w-64 z-50">
   <div class="mb-stack-lg">
     <h1 class="font-headline-md text-headline-md text-primary font-bold">MyNaijaDiet</h1>
@@ -47,7 +790,7 @@
   </div>
 </header>
 
-<main class="lg:ml-64 min-h-screen px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto pb-32 lg:pb-stack-lg">
+<main class="lg:ml-64 flex-1 px-margin-mobile md:px-margin-desktop py-stack-lg max-w-container-max mx-auto pb-28 lg:pb-stack-lg">
   <section class="mb-stack-lg">
     <h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Account Settings</h2>
     <p class="text-body-md text-on-surface-variant">Manage your nutritional profile and goals to get the best meal recommendations.</p>
@@ -278,7 +1021,7 @@
   </a>
 </nav>
 
-<footer class="lg:ml-64 w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest py-stack-lg">
+<footer class="lg:ml-64 w-full px-margin-mobile md:px-margin-desktop mt-auto border-t border-outline-variant bg-surface-container-highest py-stack-lg">
   <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md">
     <span class="font-headline-md text-primary font-bold">MyNaijaDiet</span>
     <p class="text-caption text-on-surface-variant opacity-80">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
@@ -288,6 +1031,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
 function selectRegion(btn, value) {
     document.getElementById('region-input').value = value;
     document.querySelectorAll('.region-btn').forEach(b => {
@@ -297,4 +1041,5 @@ function selectRegion(btn, value) {
     btn.classList.add('bg-primary/10', 'text-primary', 'border-primary', 'font-bold');
     btn.classList.remove('border-outline-variant', 'text-on-surface-variant');
 }
-{% endblock %}
+</script>
+{% endblock %} {% endcomment %}

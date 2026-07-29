@@ -391,6 +391,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script>
 function switchTab(tab) {
     const infoBtn  = document.getElementById('tab-info');
     const prepBtn  = document.getElementById('tab-prep');
@@ -456,4 +457,5 @@ function switchTab(tab) {
 
     picker.addEventListener('mouseleave', () => paint(currentChecked()));
 })();
+</script>
 {% endblock %}

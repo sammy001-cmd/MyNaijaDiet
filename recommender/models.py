@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from pathlib import Path
 
 
 # ============================================================
@@ -92,6 +93,7 @@ class HealthProfile(models.Model):
     ]
 
     user               = models.OneToOneField(User, on_delete=models.CASCADE, related_name="health_profile")
+    profile_picture    = models.ImageField(upload_to='profiles/', blank=True, null=True)
     age                = models.PositiveIntegerField(validators=[MinValueValidator(10), MaxValueValidator(100)])
     gender             = models.CharField(max_length=10, choices=GENDER_CHOICES)
     weight_kg          = models.FloatField(validators=[MinValueValidator(20), MaxValueValidator(300)])
@@ -470,7 +472,7 @@ class MealEdit(models.Model):
         blank=True,
         help_text="Proposed field values, e.g. {'food_name': 'Jollof Rice', 'calories_kcal': 620, ...}"
     )
-    image = models.ImageField(
+    proposed_image = models.ImageField(
         upload_to='meal_edit_uploads/',
         blank=True,
         null=True,
@@ -512,15 +514,15 @@ class MealEdit(models.Model):
 
         if self.action == 'create':
             meal = Meal.objects.create(**self.payload)
-            if self.image:
-                meal.image = self.image
+            if self.proposed_image:
+                self._apply_proposed_image(meal)
                 meal.save()
 
         elif self.action == 'update' and self.target_meal:
             for field, value in self.payload.items():
                 setattr(self.target_meal, field, value)
-            if self.image:
-                self.target_meal.image = self.image
+            if self.proposed_image:
+                self._apply_proposed_image(self.target_meal)
             self.target_meal.save()
 
         elif self.action == 'delete' and self.target_meal:
@@ -530,6 +532,10 @@ class MealEdit(models.Model):
         self.reviewed_by = reviewer
         self.reviewed_at = timezone.now()
         self.save()
+
+    def _apply_proposed_image(self, meal):
+        self.proposed_image.open('rb')
+        meal.image.save(Path(self.proposed_image.name).name, self.proposed_image, save=False)
 
     def reject(self, reviewer, notes=''):
         self.status = 'rejected'

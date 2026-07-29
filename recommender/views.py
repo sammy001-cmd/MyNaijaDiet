@@ -634,6 +634,10 @@ def profile(request):
             profile_obj.is_diabetic          = is_diabetic
             profile_obj.is_hypertensive      = is_hypertensive
             profile_obj.is_vegetarian        = is_vegetarian
+
+            if request.FILES.get('profile_picture'):
+                profile_obj.profile_picture = request.FILES['profile_picture']
+
             profile_obj.save()   # auto-recalculates BMI, BMR, TDEE
 
             messages.success(request, 'Profile updated! Your BMI and calorie targets have been recalculated.')
@@ -772,8 +776,8 @@ def meal_edit_queue(request):
 
 def _extract_image(cleaned_data):
     """Pull the uploaded image out of form data — it can't go in JSON payload."""
-    image = cleaned_data.pop('image', None)
-    return cleaned_data, image
+    proposed_image = cleaned_data.pop('image', None)
+    return cleaned_data, proposed_image
 
 
 # ── Staff: propose a brand new meal ───────────────────────────────────────
@@ -783,11 +787,11 @@ def propose_new_meal(request):
     if request.method == 'POST':
         form = MealEditForm(request.POST, request.FILES)
         if form.is_valid():
-            payload, image = _extract_image(form.cleaned_data)
+            payload, proposed_image = _extract_image(form.cleaned_data)
             MealEdit.objects.create(
                 action        = 'create',
                 payload       = payload,
-                image         = image,
+                proposed_image=proposed_image,
                 submitted_by  = request.user,
             )
             messages.success(request, 'New meal proposal submitted for review.')
@@ -808,12 +812,12 @@ def propose_meal_update(request, meal_id):
     if request.method == 'POST':
         form = MealEditForm(request.POST, request.FILES)
         if form.is_valid():
-            payload, image = _extract_image(form.cleaned_data)
+            payload, proposed_image = _extract_image(form.cleaned_data)
             MealEdit.objects.create(
                 action        = 'update',
                 target_meal   = meal,
                 payload       = payload,
-                image         = image,
+                proposed_image=proposed_image,
                 submitted_by  = request.user,
             )
             messages.success(request, f'Edit proposal for "{meal.food_name}" submitted for review.')
