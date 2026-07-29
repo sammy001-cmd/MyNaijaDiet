@@ -6,7 +6,7 @@ from django.db.models import Avg, Count
 from django.utils import timezone
 from .models import User, HealthProfile, Meal, MealPlan, MealPlanEntry, Recommendation, MealFeedback, MealFeedback, MealEdit
 from .forms import MealEditForm
-
+from django.templatetags.static import static
 
 # ============================================================
 # LANDING PAGE
@@ -947,3 +947,4 @@ def reject_edit(request, edit_id):
         edit.reject(reviewer=request.user, notes=notes)
         messages.warning(request, 'Proposal rejected.')
     return redirect('review_queue')
+

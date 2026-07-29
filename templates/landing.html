@@ -6,6 +6,466 @@
 <!-- 1. Include AOS CSS for Scroll Animations -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+<!-- 2. Custom Styles -->
+<style>
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  .animate-blob { animation: blob 7s infinite; }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
+  
+  .transform-3d {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+  @keyframes grow { to { width: 75%; } }
+
+  /* AI Terminal Cursor */
+  .cursor-blink { animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* Smooth details accordion */
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+  @keyframes sweep {
+    0%    {opacity: 0; margin-top: -10px}
+    100%  {opacity: 1; margin-top: 0px}
+  }
+</style>
+
+<!-- Header -->
+<header id="main-header" class="bg-white/90 backdrop-blur-md shadow-sm flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto sticky top-0 z-50 transition-all duration-500 ease-in-out" data-aos="fade-down" data-aos-duration="800">
+  <div class="font-headline-md text-headline-md font-bold text-primary hover:scale-105 transition-transform cursor-pointer">
+    MyNaijaDiet
+  </div>
+  
+  <!-- Desktop Nav -->
+  <nav class="hidden md:flex items-center gap-gutter">
+    <a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md hover:text-primary hover:-translate-y-1 transition-all" href="{% url 'landing' %}">Home</a>
+    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary hover:-translate-y-1 transition-all" href="#about">About</a>
+    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary hover:-translate-y-1 transition-all" href="#feedback">Feedback</a>
+    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary hover:-translate-y-1 transition-all" href="#faq">FAQ</a>
+    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary hover:-translate-y-1 transition-all" href="{% url 'login' %}">Login</a>
+    <a class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md transition-all duration-300 ease-in-out hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 active:scale-95" href="{% url 'register' %}">Register</a>
+  </nav>
+
+
+<!-- Mobile Nav Button -->
+  <button type="button" id="mobile-menu-btn" class="md:hidden text-primary transition-transform hover:rotate-90 duration-300 p-2 cursor-pointer z-50">
+    <span class="material-symbols-outlined text-3xl">menu</span>
+  </button>
+</header>
+
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden flex-col bg-surface-container-lowest border-b border-outline-variant/20 px-margin-mobile py-6 space-y-4 fixed top-[72px] left-0 w-full z-40 shadow-lg md:hidden">
+  <a class="text-primary font-headline-md text-lg" href="{% url 'landing' %}">Home</a>
+  <a class="text-on-surface-variant font-body-lg text-lg" href="#about">About</a>
+  <a class="text-on-surface-variant font-body-lg text-lg" href="#feedback">Feedback</a>
+  <a class="text-on-surface-variant font-body-lg text-lg" href="#faq">FAQ</a>
+  <a class="text-on-surface-variant font-body-lg text-lg" href="{% url 'login' %}">Login</a>
+  <a class="bg-primary text-on-primary px-6 py-3 rounded-full text-center font-label-md text-lg mt-2" href="{% url 'register' %}">Register</a>
+</div>
+
+<main>
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden py-stack-lg md:py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col items-center text-center">
+    <!-- Animated Background Blobs -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-fixed opacity-30 blur-3xl rounded-full animate-blob mix-blend-multiply"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-fixed opacity-30 blur-3xl rounded-full animate-blob animation-delay-2000 mix-blend-multiply"></div>
+    
+    <div class="relative z-10 max-w-4xl transform-3d">
+      <div data-aos="zoom-in" data-aos-duration="1000" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm font-semibold mb-6 shadow-sm">
+        <span class="material-symbols-outlined text-base animate-pulse">model_training</span>
+        AI-powered nutrition for modern Nigerian living
+      </div>
+      <h1 data-aos="fade-up" data-aos-duration="1200" data-aos-delay="100" class="font-headline-xl text-headline-xl text-on-surface mb-stack-md leading-tight">
+        Eat Smart. <span class="text-primary inline-block hover:scale-110 transition-transform duration-300 cursor-default">Eat Local.</span> Eat Healthy.
+      </h1>
+      <p data-aos="fade-up" data-aos-duration="1200" data-aos-delay="200" class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-2xl mx-auto">
+        Discover personalized meal plans rooted in authentic Nigerian cuisine — from jollof to egusi, designed around your goals, budget, and everyday routine.
+      </p>
+      <div data-aos="fade-up" data-aos-duration="1200" data-aos-delay="300" class="flex flex-col sm:flex-row gap-stack-md justify-center">
+        <a href="{% url 'register' %}" class="bg-primary text-on-primary px-8 py-4 rounded-full font-label-md text-label-md transition-all duration-300 hover:scale-105 hover:-translate-y-1 active:scale-95 shadow-lg hover:shadow-primary/40">
+          Get Started
+        </a>
+        <a href="#about" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-label-md text-label-md transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:-translate-y-1">
+          Learn More
+        </a>
+      </div>
+
+      <!-- AI Terminal Visual Hook (Centered gracefully below CTAs) -->
+      <div data-aos="fade-up" data-aos-duration="1200" data-aos-delay="500" class="mt-16 w-full max-w-3xl mx-auto text-left transform-3d">
+        <div class="bg-[#1C1C1A] rounded-[20px] p-6 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 hover:shadow-primary/20 transition-all duration-500">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <span class="text-xs text-white/50 font-mono tracking-widest uppercase">MyNaijaDiet_Engine</span>
+          </div>
+          <div class="font-mono text-sm space-y-2 min-h-[120px]">
+            <p class="text-white/70">> Initializing Health Profile...</p>
+            <p id="ai-step-1" class="text-blue-400 opacity-0">> Goal: Health Maintenance | TDEE: 2,150 kcal</p>
+            <p id="ai-step-2" class="text-yellow-400 opacity-0">> Scanning Local Dataset (371 entries)...</p>
+            <p id="ai-step-3" class="text-green-400 font-bold opacity-0">> Match Found: Seafood Okra & Eba (96% Macro Fit)</p>
+            <p id="ai-cursor" class="text-white font-bold cursor-blink opacity-0">_</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D Flipping Meal Cards -->
+    <div class="mt-24 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter perspective-1000">
+      
+      <!-- Row 1, Card 1 -->
+      <div data-aos="flip-left" data-aos-duration="1000" data-aos-delay="100" class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-4 hover:shadow-2xl transition-all duration-500 border border-outline-variant/30 overflow-hidden transform-3d">
+        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f6efe5]">
+          <img src="{% static 'images/images (3).jpg' %}" alt="Healthy Nigerian meal" class="w-full h-full object-contain bg-[#f6efe5] group-hover:scale-110 transition-transform duration-700" onerror="this.src='{% static 'recommender/img/placeholders/general.jpg' %}'"/>
+          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-primary shadow-sm backdrop-blur-sm">Balanced</div>
+        </div>
+        <div class="text-left">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Jollof Rice</h3>
+            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">450 kcal</span>
+          </div>
+          <p class="text-on-surface-variant font-body-md text-sm">Smoky, rich, and perfectly spiced party-style rice with lean protein support.</p>
+        </div>
+      </div>
+
+      <!-- Row 1, Card 2 -->
+      <div data-aos="flip-left" data-aos-duration="1000" data-aos-delay="200" class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-4 hover:shadow-2xl transition-all duration-500 border border-outline-variant/30 overflow-hidden transform-3d">
+        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f2f7ee]">
+          <img src="{% static 'images/images.jpg' %}" alt="Wellness meal" class="w-full h-full object-contain bg-[#f2f7ee] group-hover:scale-110 transition-transform duration-700" onerror="this.src='{% static 'recommender/img/placeholders/general.jpg' %}'"/>
+          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-tertiary shadow-sm backdrop-blur-sm">High Protein</div>
+        </div>
+        <div class="text-left">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Egusi &amp; Swallow</h3>
+            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">620 kcal</span>
+          </div>
+          <p class="text-on-surface-variant font-body-md text-sm">Nutrient-dense melon seed soup with spinach and lean goat meat.</p>
+        </div>
+      </div>
+
+      <!-- Row 1, Card 3 -->
+      <div data-aos="flip-left" data-aos-duration="1000" data-aos-delay="300" class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-4 hover:shadow-2xl transition-all duration-500 border border-outline-variant/30 overflow-hidden transform-3d">
+        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f9f4eb]">
+          <img src="{% static 'images/images (1).jpg' %}" alt="Meal planning" class="w-full h-full object-contain bg-[#f9f4eb] group-hover:scale-110 transition-transform duration-700" onerror="this.src='{% static 'recommender/img/placeholders/general.jpg' %}'"/>
+          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-secondary shadow-sm backdrop-blur-sm">Low Carb</div>
+        </div>
+        <div class="text-left">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-headline-md text-headline-md text-on-surface group-hover:text-primary transition-colors">Moi Moi</h3>
+            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">180 kcal</span>
+          </div>
+          <p class="text-on-surface-variant font-body-md text-sm">Steamed bean pudding with fish and eggs — the ultimate local superfood.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="bg-surface-container-low py-24 px-margin-mobile md:px-margin-desktop overflow-hidden">
+    <div class="max-w-container-max mx-auto">
+      <div data-aos="fade-up" class="text-center mb-16">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">How MyNaijaDiet Works</h2>
+        <p class="text-on-surface-variant max-w-xl mx-auto">A premium, culture-first nutrition experience designed to make healthy eating feel effortless.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div data-aos="fade-up" data-aos-delay="100" class="flex flex-col items-center text-center group">
+          <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mb-6 shadow-lg transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+            <span class="material-symbols-outlined text-3xl">person_search</span>
+          </div>
+          <h4 class="font-headline-md text-headline-md mb-2">1. Tell us about you</h4>
+          <p class="text-on-surface-variant font-body-md">Share your health goals, activity level, and local food preferences with our AI engine.</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="200" class="flex flex-col items-center text-center group">
+          <div class="w-16 h-16 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-6 shadow-lg transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110">
+            <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+          </div>
+          <h4 class="font-headline-md text-headline-md mb-2">2. Get personalized meals</h4>
+          <p class="text-on-surface-variant font-body-md">Receive a weekly meal plan that includes Jollof, Soups, and Snacks tailored to your calories.</p>
+        </div>
+        <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col items-center text-center group">
+          <div class="w-16 h-16 bg-tertiary-container text-on-tertiary-container rounded-full flex items-center justify-center mb-6 shadow-lg transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+            <span class="material-symbols-outlined text-3xl">monitoring</span>
+          </div>
+          <h4 class="font-headline-md text-headline-md mb-2">3. Track your progress</h4>
+          <p class="text-on-surface-variant font-body-md">Watch your energy levels rise and your health markers improve with data-driven insights.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feedback / Testimonials Section -->
+  <section id="feedback" class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
+    <div data-aos="fade-up" class="text-center mb-16">
+      <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Loved by Nigerians</h2>
+      <p class="text-on-surface-variant max-w-xl mx-auto">See how our users are hitting their health goals while eating the food they love.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+      <!-- Feedback Card 1 -->
+      <div data-aos="fade-up" data-aos-delay="100" class="bg-surface-container-lowest rounded-[20px] p-stack-lg ambient-shadow border border-outline-variant/30 relative">
+        <div class="flex gap-1 mb-4 text-[#F9A825]">
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+        </div>
+        <p class="font-body-lg text-on-surface-variant mb-6 italic">"I finally found a diet app that doesn't force me to eat salads. My energy is up, and I still get to enjoy my Sunday Rice and Stew."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold">T</div>
+          <div>
+            <p class="font-headline-md text-sm text-on-surface">Toluwani M.</p>
+            <p class="font-caption text-xs text-on-surface-variant">Lost 5kg in 2 months</p>
+          </div>
+        </div>
+      </div>
+      <!-- Feedback Card 2 -->
+      <div data-aos="fade-up" data-aos-delay="200" class="bg-surface-container-lowest rounded-[20px] p-stack-lg ambient-shadow border border-outline-variant/30 relative">
+        <div class="flex gap-1 mb-4 text-[#F9A825]">
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+        </div>
+        <p class="font-body-lg text-on-surface-variant mb-6 italic">"The AI is incredibly accurate. It balanced my macros perfectly just by recommending portions for swallow and local soups."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-bold">K</div>
+          <div>
+            <p class="font-headline-md text-sm text-on-surface">Kolawole A.</p>
+            <p class="font-caption text-xs text-on-surface-variant">Muscle Gain Plan</p>
+          </div>
+        </div>
+      </div>
+      <!-- Feedback Card 3 -->
+      <div data-aos="fade-up" data-aos-delay="300" class="bg-surface-container-lowest rounded-[20px] p-stack-lg ambient-shadow border border-outline-variant/30 relative">
+        <div class="flex gap-1 mb-4 text-[#F9A825]">
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+          <span class="material-symbols-outlined fill-current">star</span>
+        </div>
+        <p class="font-body-lg text-on-surface-variant mb-6 italic">"As a busy student, this saves me so much time. I just open my dashboard and my meals are planned out using budget-friendly ingredients."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold">E</div>
+          <div>
+            <p class="font-headline-md text-sm text-on-surface">Eniola B.</p>
+            <p class="font-caption text-xs text-on-surface-variant">Health Maintenance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="bg-surface-container-low py-24 px-margin-mobile md:px-margin-desktop overflow-hidden">
+    <div class="max-w-3xl mx-auto">
+      <div data-aos="fade-up" class="text-center mb-12">
+        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Frequently Asked Questions</h2>
+        <p class="text-on-surface-variant font-body-lg">Everything you need to know about MyNaijaDiet.</p>
+      </div>
+      
+      <div class="space-y-4">
+        <!-- FAQ Item 1 -->
+        <details data-aos="fade-up" data-aos-delay="100" class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-6 group cursor-pointer ambient-shadow">
+          <summary class="flex justify-between items-center font-headline-md text-lg text-on-surface outline-none">
+            Is the meal plan generation really free?
+            <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+          </summary>
+          <p class="mt-4 text-on-surface-variant font-body-md leading-relaxed">
+            Yes! Setting up your profile, tracking your TDEE, and generating your weekly Nigerian meal plans are completely free to use.
+          </p>
+        </details>
+        <!-- FAQ Item 2 -->
+        <details data-aos="fade-up" data-aos-delay="200" class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-6 group cursor-pointer ambient-shadow">
+          <summary class="flex justify-between items-center font-headline-md text-lg text-on-surface outline-none">
+            Do I have to cook everything from scratch?
+            <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+          </summary>
+          <p class="mt-4 text-on-surface-variant font-body-md leading-relaxed">
+            Not at all. The AI recommends standard Nigerian meals. You can cook them yourself, eat them at a local restaurant, or buy them from a vendor, as long as you maintain the recommended portion sizes.
+          </p>
+        </details>
+        <!-- FAQ Item 3 -->
+        <details data-aos="fade-up" data-aos-delay="300" class="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-6 group cursor-pointer ambient-shadow">
+          <summary class="flex justify-between items-center font-headline-md text-lg text-on-surface outline-none">
+            How accurate is the AI model?
+            <span class="material-symbols-outlined text-primary group-open:rotate-180 transition-transform duration-300">expand_more</span>
+          </summary>
+          <p class="mt-4 text-on-surface-variant font-body-md leading-relaxed">
+            Our recommendation engine is built on a LightGBM machine learning framework trained on over 300+ unique Nigerian meals, prioritizing precise macro-nutrient matching for your specific body data.
+          </p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
+    <div data-aos="zoom-in-up" data-aos-duration="1200" class="bg-primary text-on-primary rounded-3xl p-stack-lg md:p-20 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-gutter shadow-2xl hover:shadow-primary/30 transition-shadow duration-500">
+      <!-- Animated Inner Blob -->
+      <div class="absolute top-0 right-0 w-80 h-80 bg-white/20 blur-3xl rounded-full animate-blob"></div>
+      
+      <div class="relative z-10 md:w-1/2" data-aos="fade-right" data-aos-delay="300">
+        <h2 class="font-headline-lg text-headline-lg text-white mb-6">Ready to start your premium health journey?</h2>
+        <p class="font-body-lg text-on-primary-container mb-8">Join thousands of Nigerians using AI to live their healthiest lives without sacrificing the food they love.</p>
+        <a href="{% url 'register' %}" class="inline-block bg-secondary-container text-on-secondary-container px-10 py-5 rounded-full font-label-md text-lg hover:scale-110 hover:-translate-y-2 transition-all duration-300 active:scale-95 shadow-xl hover:shadow-white/20">
+          Get Started Free
+        </a>
+      </div>
+      
+      <!-- 3D Floating UI Element -->
+      <div data-aos="fade-left" data-aos-delay="500" class="relative z-10 md:w-5/12 bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20 shadow-2xl transform-3d hover:-translate-y-4 hover:rotate-2 transition-transform duration-500">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-inner">
+            <span class="material-symbols-outlined text-primary">restaurant</span>
+          </div>
+          <div>
+            <p class="font-label-md text-sm opacity-80 uppercase tracking-widest">Recommended Breakfast</p>
+            <p class="font-headline-md text-white">Akara &amp; Pap</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="h-2 w-full bg-white/20 rounded-full overflow-hidden">
+            <!-- Animated Progress Bar -->
+            <div class="h-full bg-secondary-fixed-dim w-0 animate-[grow_1.5s_ease-out_forwards] animation-delay-1000"></div>
+          </div>
+          <div class="flex justify-between text-caption font-label-md">
+            <span>Protein: 15g</span>
+            <span>Carbs: 45g</span>
+            <span>Fat: 8g</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest py-stack-lg transition-colors">
+  <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md">
+    <div class="flex flex-col items-center md:items-start">
+      <div class="font-headline-md text-headline-md text-primary mb-2">MyNaijaDiet</div>
+      <p class="font-caption text-caption text-on-surface-variant text-center md:text-left">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
+    </div>
+    <div class="flex gap-gutter">
+      <a class="text-on-surface-variant font-caption text-caption hover:text-primary hover:-translate-y-1 transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+      <a class="text-on-surface-variant font-caption text-caption hover:text-primary hover:-translate-y-1 transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+      <a class="text-on-surface-variant font-caption text-caption hover:text-primary hover:-translate-y-1 transition-all opacity-80 hover:opacity-100" href="#">Contact Us</a>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<!-- 3. Include AOS JS Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Scroll Animations
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+          once: false,       
+          mirror: true,      
+          offset: 120,       
+          easing: 'ease-in-out-cubic', 
+        });
+    }
+
+    // 2. Header Scroll Effect
+    const header = document.getElementById('main-header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md', 'bg-white/90', 'backdrop-blur-md', 'py-2');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.remove('shadow-md', 'bg-white/90', 'backdrop-blur-md', 'py-2');
+                header.classList.add('py-4');
+            }
+        });
+    }
+
+    // 3. Bulletproof Mobile Menu Logic
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Stop any default button behavior
+            
+            // Explicitly check and swap classes instead of using toggle()
+            if (mobileMenu.classList.contains('hidden')) {
+                // Open menu
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+            } else {
+                // Close menu
+                mobileMenu.classList.remove('flex');
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Close Mobile Menu when clicking any link inside it
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('flex');
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    }
+
+    // 4. AI Terminal Typing Animation Logic
+    const aiSteps = [
+      document.getElementById('ai-step-1'),
+      document.getElementById('ai-step-2'),
+      document.getElementById('ai-step-3'),
+    ];
+    const aiCursor = document.getElementById('ai-cursor');
+    
+    // Only run if the AI terminal exists on the page
+    if (aiSteps[0] && aiCursor) {
+        setTimeout(() => {
+          let currentStep = 0;
+          
+          setInterval(() => {
+            if (currentStep < aiSteps.length) {
+              aiSteps[currentStep].style.opacity = '1';
+              currentStep++;
+            } else {
+              // Reset loop seamlessly
+              aiSteps.forEach(step => step.style.opacity = '0');
+              currentStep = 0;
+            }
+          }, 1500); // Trigger next line every 1.5s
+          
+          aiCursor.style.opacity = '1';
+        }, 1500);
+    }
+});
+</script>
+{% endblock %}
+
+{% comment %} {% extends "base.html" %}
+{% load static %}
+{% block title %}MyNaijaDiet | Eat Smart. Eat Local. Eat Healthy.{% endblock %}
+
+{% block body %}
+<!-- 1. Include AOS CSS for Scroll Animations -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
 <!-- 2. Custom Styles for Ambient 3D Floating Blobs -->
 <style>
   @keyframes blob {
@@ -287,189 +747,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-{% endblock %}
-
-{% comment %} {% extends "base.html" %}
-{% load static %}
-{% block title %}MyNaijaDiet | Eat Smart. Eat Local. Eat Healthy.{% endblock %}
-
-{% block body %}
-<header class="bg-white/90 backdrop-blur-md shadow-sm flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto sticky top-0 z-50 transition-all duration-200 ease-in-out">
-  <div class="font-headline-md text-headline-md font-bold text-primary">MyNaijaDiet</div>
-  <nav class="hidden md:flex items-center gap-gutter">
-    <a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md hover:text-primary transition-colors" href="{% url 'landing' %}">Home</a>
-    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="#about">About</a>
-    <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors" href="{% url 'login' %}">Login</a>
-    <a class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md transition-all duration-200 ease-in-out hover:shadow-lg active:scale-95" href="{% url 'register' %}">Register</a>
-  </nav>
-  <button class="md:hidden text-primary">
-    <span class="material-symbols-outlined">menu</span>
-  </button>
-</header>
-
-<main>
-  <section class="relative overflow-hidden py-stack-lg md:py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto flex flex-col items-center text-center">
-    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-fixed opacity-20 blur-3xl rounded-full"></div>
-    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-secondary-fixed opacity-20 blur-3xl rounded-full"></div>
-    <div class="relative z-10 max-w-4xl">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 text-primary text-sm font-semibold mb-6">
-        <span class="material-symbols-outlined text-base">auto_awesome</span>
-        AI-powered nutrition for modern Nigerian living
-      </div>
-      <h1 class="font-headline-xl text-headline-xl text-on-surface mb-stack-md leading-tight">
-        Eat Smart. <span class="text-primary">Eat Local.</span> Eat Healthy.
-      </h1>
-      <p class="font-body-lg text-body-lg text-on-surface-variant mb-stack-lg max-w-2xl mx-auto">
-        Discover personalized meal plans rooted in authentic Nigerian cuisine — from jollof to egusi, designed around your goals, budget, and everyday routine.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-stack-md justify-center">
-        <a href="{% url 'register' %}" class="bg-primary text-on-primary px-8 py-4 rounded-full font-label-md text-label-md transition-transform hover:scale-105 active:scale-95 shadow-lg">
-          Get Started
-        </a>
-        <a href="#about" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-label-md text-label-md transition-all hover:bg-primary/5">
-          Learn More
-        </a>
-      </div>
-    </div>
-
-    <div class="mt-20 w-full grid grid-cols-1 md:grid-cols-3 gap-gutter">
-      <div class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-2 transition-transform duration-300 border border-outline-variant/30 overflow-hidden">
-        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f6efe5]">
-          <img src="{% static 'images/images (3).jpg' %}" alt="Healthy Nigerian meal illustration" class="w-full h-full object-contain bg-[#f6efe5]" />
-          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-primary">Balanced</div>
-        </div>
-        <div class="text-left">
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="font-headline-md text-headline-md text-on-surface">Jollof Rice</h3>
-            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">450 kcal</span>
-          </div>
-          <p class="text-on-surface-variant font-body-md text-sm">Smoky, rich, and perfectly spiced party-style rice with lean protein support.</p>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-2 transition-transform duration-300 border border-outline-variant/30 overflow-hidden">
-        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f2f7ee]">
-          <img src="{% static 'images/images.jpg' %}" alt="Wellness meal illustration" class="w-full h-full object-contain bg-[#f2f7ee]" />
-          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-tertiary">High Protein</div>
-        </div>
-        <div class="text-left">
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="font-headline-md text-headline-md text-on-surface">Egusi &amp; Swallow</h3>
-            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">620 kcal</span>
-          </div>
-          <p class="text-on-surface-variant font-body-md text-sm">Nutrient-dense melon seed soup with spinach and lean goat meat.</p>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-lowest rounded-[20px] p-stack-md ambient-shadow group hover:-translate-y-2 transition-transform duration-300 border border-outline-variant/30 overflow-hidden">
-        <div class="w-full h-48 rounded-[16px] overflow-hidden mb-stack-md relative bg-[#f9f4eb]">
-          <img src="{% static 'images/images (1).jpg' %}" alt="Meal planning illustration" class="w-full h-full object-contain bg-[#f9f4eb]" />
-          <div class="absolute top-2 right-2 bg-white/90 px-3 py-1 rounded-full text-caption font-label-md text-secondary">Low Carb</div>
-        </div>
-        <div class="text-left">
-          <div class="flex justify-between items-center mb-1">
-            <h3 class="font-headline-md text-headline-md text-on-surface">Moi Moi</h3>
-            <span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-caption">180 kcal</span>
-          </div>
-          <p class="text-on-surface-variant font-body-md text-sm">Steamed bean pudding with fish and eggs — the ultimate local superfood.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="about" class="bg-surface-container-low py-24 px-margin-mobile md:px-margin-desktop">
-    <div class="max-w-container-max mx-auto">
-      <div class="text-center mb-16">
-        <h2 class="font-headline-lg text-headline-lg text-primary mb-4">How MyNaijaDiet Works</h2>
-        <p class="text-on-surface-variant max-w-xl mx-auto">A premium, culture-first nutrition experience designed to make healthy eating feel effortless.</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="flex flex-col items-center text-center">
-          <div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mb-6 shadow-md transition-transform hover:rotate-12">
-            <span class="material-symbols-outlined text-3xl">person_search</span>
-          </div>
-          <h4 class="font-headline-md text-headline-md mb-2">1. Tell us about you</h4>
-          <p class="text-on-surface-variant font-body-md">Share your health goals, activity level, and local food preferences with our AI engine.</p>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <div class="w-16 h-16 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center mb-6 shadow-md transition-transform hover:rotate-12">
-            <span class="material-symbols-outlined text-3xl">auto_awesome</span>
-          </div>
-          <h4 class="font-headline-md text-headline-md mb-2">2. Get personalized meals</h4>
-          <p class="text-on-surface-variant font-body-md">Receive a weekly meal plan that includes Jollof, Soups, and Snacks tailored to your calories.</p>
-        </div>
-        <div class="flex flex-col items-center text-center">
-          <div class="w-16 h-16 bg-tertiary-container text-on-tertiary-container rounded-full flex items-center justify-center mb-6 shadow-md transition-transform hover:rotate-12">
-            <span class="material-symbols-outlined text-3xl">monitoring</span>
-          </div>
-          <h4 class="font-headline-md text-headline-md mb-2">3. Track your progress</h4>
-          <p class="text-on-surface-variant font-body-md">Watch your energy levels rise and your health markers improve with data-driven insights.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-    <div class="bg-primary text-on-primary rounded-3xl p-stack-lg md:p-20 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-gutter shadow-2xl">
-      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl rounded-full"></div>
-      <div class="relative z-10 md:w-1/2">
-        <h2 class="font-headline-lg text-headline-lg text-white mb-6">Ready to start your premium health journey?</h2>
-        <p class="font-body-lg text-on-primary-container mb-8">Join thousands of Nigerians using AI to live their healthiest lives without sacrificing the food they love.</p>
-        <a href="{% url 'register' %}" class="inline-block bg-secondary-container text-on-secondary-container px-10 py-5 rounded-full font-label-md text-lg hover:scale-105 transition-transform active:scale-95 shadow-xl">
-          Get Started Free
-        </a>
-      </div>
-      <div class="relative z-10 md:w-5/12 bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/20">
-        <div class="flex items-center gap-4 mb-6">
-          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-            <span class="material-symbols-outlined text-primary">restaurant</span>
-          </div>
-          <div>
-            <p class="font-label-md text-sm opacity-80 uppercase tracking-widest">Recommended Breakfast</p>
-            <p class="font-headline-md text-white">Akara &amp; Pap</p>
-          </div>
-        </div>
-        <div class="space-y-4">
-          <div class="h-2 w-full bg-white/20 rounded-full overflow-hidden">
-            <div class="h-full bg-secondary-fixed-dim w-3/4"></div>
-          </div>
-          <div class="flex justify-between text-caption font-label-md">
-            <span>Protein: 15g</span>
-            <span>Carbs: 45g</span>
-            <span>Fat: 8g</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<!-- Footer -->
-<footer class="w-full px-margin-mobile md:px-margin-desktop mt-stack-lg border-t border-outline-variant bg-surface-container-highest py-stack-lg transition-colors">
-  <div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-stack-md">
-    <div class="flex flex-col items-center md:items-start">
-      <div class="font-headline-md text-headline-md text-primary mb-2">MyNaijaDiet</div>
-      <p class="font-caption text-caption text-on-surface-variant text-center md:text-left">&copy; 2026 MyNaijaDiet. Health is Wealth.</p>
-    </div>
-    <div class="flex gap-gutter">
-      <a class="text-on-surface-variant font-caption text-caption hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
-      <a class="text-on-surface-variant font-caption text-caption hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
-      <a class="text-on-surface-variant font-caption text-caption hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Contact Us</a>
-    </div>
-  </div>
-</footer>
-{% endblock %}
-
-{% block extra_js %}
-document.addEventListener('DOMContentLoaded', () => {
-    const header = document.querySelector('header');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('shadow-md', 'bg-white/90', 'backdrop-blur-md');
-        } else {
-            header.classList.remove('shadow-md', 'bg-white/90', 'backdrop-blur-md');
-        }
-    });
-});
-{% endblock %} {% endcomment %}
+{% endblock %}  {% endcomment %}

@@ -14,22 +14,32 @@
 {% block body %}
 <div class="bg-pattern min-h-screen flex flex-col">
 <!-- TopNavBar -->
-<header class="bg-surface shadow-sm flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto sticky top-0 z-50">
-  <div class="font-headline-md text-headline-md font-bold text-primary">MyNaijaDiet</div>
+<header id="main-header" class="bg-surface shadow-sm flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto sticky top-0 z-50 transition-all duration-500 ease-in-out">
+  <a href="{% url 'landing' %}" class="font-headline-md text-headline-md font-bold text-primary hover:scale-105 transition-transform cursor-pointer">
+    MyNaijaDiet
+  </a>
   <nav class="hidden md:flex gap-stack-lg items-center">
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="{% url 'landing' %}">Home</a>
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
     <a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1" href="{% url 'login' %}">Login</a>
     <a class="font-body-md text-body-md px-6 py-2 bg-primary text-on-primary rounded-full hover:shadow-lg transition-all active:scale-95" href="{% url 'register' %}">Register</a>
   </nav>
-  <button class="md:hidden text-primary">
-    <span class="material-symbols-outlined">menu</span>
+  <!-- Mobile Nav Button -->
+  <button type="button" id="mobile-menu-btn" class="md:hidden text-primary transition-transform hover:rotate-90 duration-300 p-2 cursor-pointer z-50">
+    <span class="material-symbols-outlined text-3xl">menu</span>
   </button>
 </header>
 
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden flex-col bg-surface-container-lowest border-b border-outline-variant/20 px-margin-mobile py-6 space-y-4 fixed top-[72px] left-0 w-full z-40 shadow-lg md:hidden">
+  <a class="text-primary font-headline-md text-lg" href="{% url 'landing' %}">Home</a>
+  <a class="text-on-surface-variant font-body-lg text-lg" href="{% url 'login' %}">Login</a>
+  <a class="bg-primary text-on-primary px-6 py-3 rounded-full text-center font-label-md text-lg mt-2" href="{% url 'register' %}">Register</a>
+</div>
+
 <!-- Login Main Content -->
 <main class="flex-grow flex items-center justify-center px-margin-mobile py-stack-lg">
-  <div class="w-full max-w-md">
+  <div class="w-full max-w-md z-10">
     <div class="bg-surface-container-lowest rounded-xl p-8 md:p-10 border border-outline-variant/30 shadow-[0px_4px_20px_rgba(27,94,32,0.04)]">
 
       <!-- Brand Identity -->
@@ -100,7 +110,9 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
 <script>
+// Login Form Logic
 function togglePassword() {
     const pass = document.getElementById('password');
     const icon = document.getElementById('toggle-icon');
@@ -112,4 +124,32 @@ function togglePassword() {
         icon.textContent = 'visibility';
     }
 }
+
+// Mobile Menu Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+            } else {
+                mobileMenu.classList.remove('flex');
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('flex');
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    }
+});
 </script>
+{% endblock %}
