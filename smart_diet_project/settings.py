@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "cloudinary_storage",
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles", 
+    "cloudinary_storage",          
     "cloudinary",
     "recommender",
 ]
@@ -50,7 +50,7 @@ ROOT_URLCONF = "smart_diet_project.urls"
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.DjangoTemplates",
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -130,8 +130,5 @@ STORAGES = {
 # Backward compatibility fix for django-cloudinary-storage on Django 6.0
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
-# Stop TensorFlow warning messages
-# os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
