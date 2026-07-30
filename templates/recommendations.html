@@ -158,24 +158,30 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
       {% for meal in meals %}
       <div class="rec-card bg-white rounded-[16px] overflow-hidden shadow-[0px_4px_20px_rgba(15,61,19,0.05)] hover:shadow-[0px_10px_32px_rgba(15,61,19,0.09)] flex flex-col h-full">
-        <div class="relative h-48 overflow-hidden flex items-center justify-center" style="background: var(--forest-soft);">
-          <!-- Blurred backdrop fill — hides letterboxing without stretching the real photo -->
-          <img src="{{ meal.get_display_image }}" alt="" aria-hidden="true"
-               class="absolute inset-0 w-full h-full object-cover scale-110"
-               style="filter: blur(20px) brightness(0.75); opacity: 0.6;"
-               onerror="this.style.display='none';">
-          <!-- Foreground — shown at its true proportions, never stretched or upscaled beyond native size -->
-          <img src="{{ meal.get_display_image }}" alt="{{ meal.name }}"
-               class="relative z-10 max-w-full max-h-full object-contain"
-               onerror="this.onerror=null; this.src='{% static 'recommender/img/placeholders/general.jpg' %}'; this.previousElementSibling.style.display='none';">
+        
+        <!-- UPDATED IMAGE CONTAINER -->
+        <div class="relative w-full h-48 overflow-hidden group" style="background: var(--forest-soft);">
+          
+          <!-- Primary Image (Fills container perfectly with object-cover) -->
+          <img src="{{ meal.get_display_image }}" 
+               alt="{{ meal.name }}"
+               class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-20"
+               onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
 
-          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
+          <!-- Bulletproof CSS Fallback (Reveals instantly if image is missing/broken) -->
+          <div class="absolute inset-0 hidden flex-col items-center justify-center p-4 text-center z-10" style="background: var(--forest-soft); color: var(--forest);">
+            <span class="material-symbols-outlined text-4xl opacity-30 mb-2">restaurant</span>
+            <span class="text-xs font-bold opacity-60 line-clamp-2 px-2">{{ meal.name }}</span>
+          </div>
+
+          <!-- Badges (Z-index updated to sit above images) -->
+          <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 z-30 shadow-sm">
             <span class="material-symbols-outlined text-[16px]" style="color: var(--gold); font-variation-settings: 'FILL' 1">local_fire_department</span>
             <span class="text-[12px] font-bold text-on-surface">{{ meal.calories }} kcal</span>
           </div>
 
           <!-- Pepper-gauge match score -->
-          <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm pl-1.5 pr-2.5 py-1.5 rounded-full shadow-sm"
+          <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm pl-1.5 pr-2.5 py-1.5 rounded-full shadow-sm z-30"
                title="AI match confidence for your {{ profile.health_goal|cut:'_' }} goal">
             <svg width="20" height="20" viewBox="0 0 22 22" class="shrink-0">
               <circle cx="11" cy="11" r="8.5" fill="none" stroke="#f1e4dc" stroke-width="3"/>
@@ -187,6 +193,7 @@
             <span class="text-[11px] font-bold" style="color: #C1440E;">{% widthratio meal.match_score|default:0.5 1 100 %}%</span>
           </div>
         </div>
+        <!-- END UPDATED IMAGE CONTAINER -->
 
         <div class="p-stack-md flex flex-col flex-grow">
           <div class="flex justify-between items-start mb-1">
