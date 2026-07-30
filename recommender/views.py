@@ -640,7 +640,7 @@ def profile(request):
 
             profile_obj.save()   # auto-recalculates BMI, BMR, TDEE
 
-            messages.success(request, 'Profile updated! Your BMI and calorie targets have been recalculated.')
+            messages.success(request, 'Profile updated successfully!')
         except Exception as e:
             messages.error(request, f'Update failed: {str(e)}')
 
